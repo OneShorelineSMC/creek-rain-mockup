@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Creek Rain Watch — Mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#16202B;--muted:#556274;--soft:#3A4756;--line:#D5DAE1;--bg:#F4F5F7;--card:#FFFFFF;--panel:#F6F7F9}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+  .wrap{max-width:1240px;margin:0 auto;padding:0 20px}
+  header{background:var(--ink);color:#F4F6F8;padding:24px 0}
+  header h1{margin:0 0 6px;font-size:clamp(24px,4vw,32px)}
+  header p{margin:0;font-size:17px;line-height:1.5;color:#D5DCE4;max-width:780px}
+  .meta{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:12px}
+  .meta span{font-size:14px;color:#D5DCE4}
+  .sample{background:#F5D33B;color:var(--ink)!important;font-weight:600;font-size:13px!important;padding:4px 10px;border-radius:4px}
+  .tabs{display:flex;gap:8px;margin-top:16px}
+  .tabs button{font:inherit;font-size:15px;font-weight:600;padding:10px 16px;min-height:44px;border-radius:8px;border:1px solid #3A4756;background:transparent;color:#F4F6F8;cursor:pointer}
+  .tabs button[aria-selected="true"]{background:#F4F6F8;color:var(--ink)}
+  h2{font-size:18px;margin:24px 0 12px}
+  .legend{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+  .lg{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:flex;gap:12px;align-items:flex-start}
+  .sw{width:26px;height:26px;border-radius:6px;border:1px solid rgba(0,0,0,.15);flex-shrink:0}
+  .lg b{display:block;font-size:16px}.lg span{font-size:14px;color:var(--soft);line-height:1.4}
+  .note{font-size:14px;color:var(--muted);line-height:1.5;margin:14px 0 0}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:16px;padding:20px 0 28px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
+  .card h3{margin:0;font-size:21px}
+  .place{font-size:14px;color:var(--muted)}
+  .pub .head{padding:16px 18px 10px}
+  .pill{margin:0 18px;border-radius:8px;padding:10px 14px;display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+  .pill strong{font-size:19px}.pill span{font-size:15px;font-weight:600}
+  .body{padding:12px 18px 16px;display:flex;flex-direction:column;gap:10px}
+  .body p{margin:0;font-size:16px;line-height:1.5}
+  .todo{color:var(--soft)}.todo b{color:var(--ink)}
+  .foot{margin-top:auto;padding:10px 18px;background:var(--panel);border-top:1px solid #E3E7EC;font-size:13px;color:var(--muted)}
+  .staff .band{padding:14px 16px;display:flex;justify-content:space-between;gap:12px}
+  .staff .band .lvl{text-align:right;flex-shrink:0}
+  .staff .band .lvl b{display:block;text-transform:uppercase;letter-spacing:.04em;font-size:14px}
+  .mono{font-family:'IBM Plex Mono',monospace;font-size:13px}
+  .lab{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+  .sec{padding:12px 16px 4px;display:flex;flex-direction:column;gap:5px}
+  .sec .drv{font-size:15px;line-height:1.4}
+  .gauges{padding:6px 16px 12px}
+  .g{display:flex;align-items:center;gap:10px;padding:7px 0;border-top:1px solid #ECEFF3}
+  .dot{width:12px;height:12px;border-radius:50%;border:1px solid rgba(0,0,0,.2);flex-shrink:0}
+  .g .nm{flex-grow:1;min-width:0;display:flex;flex-direction:column}
+  .g .nm b{font-weight:500;font-size:14px}.g .nm span{font-size:12px;color:var(--muted)}
+  .flag{font-size:12px;color:#8A4B00;background:#FFF4E5;border:1px solid #F3D3A6;border-radius:4px;padding:6px 8px;line-height:1.4;margin-top:6px}
+  footer{padding:0 0 40px;font-size:14px;line-height:1.5;color:var(--soft)}
+  footer p{margin:0 0 8px}
+  [hidden]{display:none!important}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1 id="title">How hard is it raining near my creek?</h1>
+    <p id="sub">We compare rain in the hills above each creek with how often rain that heavy happens there. The lower the chance in a given year, the rarer the downpour — and the more likely creeks rise fast.</p>
+    <div class="meta"><span>Updated [TIME]</span><span class="sample">MOCKUP — sample storm, not real conditions</span></div>
+    <div class="tabs" role="tablist" aria-label="View">
+      <button role="tab" id="t-pub" aria-selected="true" aria-controls="v-pub">Public view</button>
+      <button role="tab" id="t-staff" aria-selected="false" aria-controls="v-staff">Staff view</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section id="v-pub" role="tabpanel" aria-labelledby="t-pub">
+    <h2>What the colors mean</h2>
+    <div class="legend" id="pub-legend"></div>
+    <div class="grid" id="pub-cards"></div>
+  </section>
+  <section id="v-staff" role="tabpanel" aria-labelledby="t-staff" hidden>
+    <h2>Annual exceedance probability (AEP) of rainfall at each gauge</h2>
+    <div class="legend" id="staff-legend"></div>
+    <p class="note">Card color = most extreme duration across the creek's linked gauges. Red and above needs a second gauge at orange or higher; otherwise the card is marked “single gauge — unconfirmed.”</p>
+    <div class="grid" id="staff-cards"></div>
+  </section>
+</main>
+
+<footer class="wrap">
+  <p><b>This shows rain, not flooding.</b> A creek can flood with less rain when the ground is already soaked, and a heavy downpour does not always cause flooding.</p>
+  <p>“10% chance in any year” means rain this heavy is expected about once a decade on average — but it can happen two years in a row.</p>
+  <p>Thresholds: NOAA Atlas 14 Vol. 6 v2 point precipitation frequency estimates (partial-duration series) at each gauge; AEP = 1 − e<sup>−1/ARI</sup>. Never walk or drive through moving water. In an emergency, call 911.</p>
+</footer>
+
+<script>
+(function () {
+  var C = {
+    none:{bg:'#D9DDE3',fg:'#16202B',name:'None'}, yellow:{bg:'#F5D33B',fg:'#16202B',name:'Yellow'},
+    orange:{bg:'#F08A24',fg:'#16202B',name:'Orange'}, red:{bg:'#C8352B',fg:'#FFFFFF',name:'Red'},
+    purple:{bg:'#6E3FB8',fg:'#FFFFFF',name:'Purple'}, magenta:{bg:'#B0207C',fg:'#FFFFFF',name:'Magenta'}
+  };
+  // Public levels: none -> Normal, yellow -> Heavy, orange -> Very heavy, red/purple/magenta -> Severe
+  var P = {
+    none:{bg:C.none.bg,fg:C.none.fg,name:'Normal',todo:'No action needed.'},
+    yellow:{bg:C.yellow.bg,fg:C.yellow.fg,name:'Heavy rain',todo:'Stay aware and keep away from creek banks.'},
+    orange:{bg:C.orange.bg,fg:C.orange.fg,name:'Very heavy rain',todo:'Watch for street flooding. Avoid low spots and creek crossings.'},
+    severe:{bg:C.red.bg,fg:C.red.fg,name:'Severe rain',todo:'Be ready to act. Stay away from the creek and follow local alerts.'}
+  };
+  function pubLevel(c){ return (c==='red'||c==='purple'||c==='magenta') ? 'severe' : c; }
+
+  // Sample storm — illustrative values computed against each gauge's Atlas 14 table.
+  var creeks = [
+    {name:'Belmont Creek',place:'Belmont, San Carlos',color:'purple',aep:'9% AEP',chance:'~10% chance / yr',
+     pub:'Rain in the past hour has about a 10% chance of happening here in any given year.',
+     driver:'1 hr: 0.75 in at Belmont Creek gauge',confirm:'Confirmed — Pulgas at orange',stage:'41104',
+     flag:'Check: is Pulgas inside the Belmont Creek watershed?',
+     gauges:[['Belmont Creek (41104)','Co-located · primary','purple','1 hr · 9% AEP'],['Pulgas (PUL)','Upslope · 3.2 mi SW','orange','1 hr · 21% AEP'],['Crystal Springs Cottage (CSC)','Upslope · 3.5 mi SW','orange','6 hr · 39% AEP']]},
+    {name:'Atherton Channel',place:'Atherton, Redwood City, Menlo Park',color:'red',aep:'15% AEP',chance:'~15% chance / yr',
+     pub:'The past 3 hours of rain in the hills above this creek have about a 15% chance in any given year.',
+     driver:'3 hr: 1.94 in at Huddart Park',confirm:'Confirmed — Wunderlich at orange',stage:'41107 · 41106',
+     gauges:[['Huddart Park','Upper watershed · primary','red','3 hr · 15% AEP'],['Wunderlich County Park','Upper watershed · 4.1 mi SW','orange','3 hr · 19% AEP'],['Atherton at Alameda (41107)','Co-located','orange','3 hr · 39% AEP'],['Atherton upstream of CalTrain (41106)','Co-located','yellow','3 hr · 45% AEP']]},
+    {name:'Redwood Creek',place:'Redwood City',color:'red',aep:'15% AEP',chance:'~15% chance / yr',
+     pub:'The past 3 hours of rain in the hills above this creek have about a 15% chance in any given year.',
+     driver:'3 hr: 1.94 in at Huddart Park',confirm:'Confirmed — Pulgas and Redwood Creek at orange',stage:'41105',
+     gauges:[['Redwood Creek (41105)','Co-located · primary','orange','3 hr · 34% AEP'],['Pulgas (PUL)','Upslope · 3.7 mi W','orange','1 hr · 21% AEP'],['Huddart Park','Upslope · 3.8 mi SW','red','3 hr · 15% AEP']]},
+    {name:'Bear Creek',place:'Woodside, Portola Valley',color:'red',aep:'15% AEP',chance:'~15% chance / yr',
+     pub:'The past 3 hours of rain in the hills above this creek have about a 15% chance in any given year.',
+     driver:'3 hr: 1.94 in at Huddart Park',confirm:'Confirmed — Wunderlich at orange',stage:'BCSH',
+     gauges:[['Wunderlich County Park','Primary · 1.9 mi W','orange','3 hr · 19% AEP'],['Huddart Park','3.3 mi NW','red','3 hr · 15% AEP']]},
+    {name:'San Francisquito Creek',place:'Menlo Park, Palo Alto, East Palo Alto',color:'orange',aep:'19% AEP',chance:'~20% chance / yr',
+     pub:'The past 3 hours of rain in the hills above this creek have about a 20% chance in any given year.',
+     driver:'3 hr: 2.14 in at Wunderlich County Park',stage:'SFC',flag:'SFC and 11164500 are the same location — pick one.',
+     gauges:[['Wunderlich County Park','Upper watershed · primary','orange','3 hr · 19% AEP'],['Windy Hill','Upper watershed · 5.3 mi SW','orange','3 hr · 39% AEP'],['Trappers Trail (Valley Water)','Headwaters · 5.3 mi S','yellow','3 hr · 57% AEP']]},
+    {name:'San Bruno Creek',place:'San Bruno',color:'orange',aep:'28% AEP',chance:'~30% chance / yr',limited:true,
+     pub:'The past 3 hours of rain have about a 30% chance of happening here in any given year.',
+     driver:'3 hr: 1.07 in at San Bruno Creek gauge',stage:'41102',flag:'Coverage gap: no rain gauge in the upper watershed.',
+     gauges:[['San Bruno Creek (41102)','Co-located · primary','orange','3 hr · 28% AEP'],['San Bruno Mountain (41200)','Outside watershed · 5.3 mi NW','orange','6 hr · 33% AEP']]},
+    {name:'Colma Creek',place:'South San Francisco, Colma',color:'orange',aep:'33% AEP',chance:'~35% chance / yr',
+     pub:'The past 6 hours of rain on San Bruno Mountain have about a 1-in-3 chance in any given year.',
+     driver:'6 hr: 1.60 in at San Bruno Mountain',stage:'41101',
+     gauges:[['Colma Creek (41101)','Co-located · primary','yellow','6 hr · 46% AEP'],['San Bruno Mountain (41200)','Headwaters · 2.9 mi NW','orange','6 hr · 33% AEP']]},
+    {name:'Los Trancos Creek',place:'Portola Valley, Palo Alto',color:'orange',aep:'39% AEP',chance:'~40% chance / yr',
+     pub:'The past 3 hours of rain in the hills above this creek have about a 40% chance in any given year.',
+     driver:'3 hr: 1.62 in at Windy Hill',stage:'LTAA',
+     gauges:[['Trappers Trail (Valley Water)','Headwaters · primary','yellow','3 hr · 57% AEP'],['Los Trancos','4.0 mi S','yellow','3 hr · 63% AEP'],['Windy Hill','3.1 mi SW','orange','3 hr · 39% AEP']]},
+    {name:'San Mateo Creek',place:'San Mateo',color:'orange',aep:'39% AEP',chance:'~40% chance / yr',
+     pub:'The past 6 hours of rain above Crystal Springs have about a 40% chance in any given year. The reservoir holds back much of this water.',
+     driver:'6 hr: 1.59 in at Crystal Springs Cottage',stage:'41103',flag:'Below Crystal Springs, flow is set largely by reservoir releases.',
+     gauges:[['San Mateo Creek (41103)','Co-located · primary','none','> 63% AEP'],['Crystal Springs Cottage (CSC)','Above reservoir · 5.1 mi S','orange','6 hr · 39% AEP']]},
+    {name:'Green Hills Creek',place:'Millbrae',color:'none',aep:'> 63% AEP',limited:true,stage:'41201',
+     flag:'Coverage gap: no rain gauge upslope in the watershed.',
+     gauges:[['Green Hills Creek (41201)','Co-located · primary','none','> 63% AEP']]},
+    {name:'Pilarcitos Creek',place:'Half Moon Bay',color:'none',aep:'> 63% AEP',limited:true,stage:'11162630 · 11162620 · 11162619',
+     flag:'Coverage gap: no gauge in the lower watershed or Arroyo Leon.',
+     gauges:[['Pilarcitos Dam (PLD)','Top of watershed · primary','none','> 63% AEP']]},
+    {name:'San Gregorio Creek',place:'San Gregorio',color:'none',aep:'> 63% AEP',stage:'11162570',
+     gauges:[['La Honda (LAH)','Up-watershed · 7.4 mi E','none','> 63% AEP']]},
+    {name:'Pescadero Creek',place:'Pescadero',color:'none',aep:'> 63% AEP',limited:true,stage:'41151 · 11162500',
+     flag:'Coverage gap: upper-watershed gauges are 5–8 mi from the stream sites.',
+     gauges:[['Pescadero Creek at Stage Rd (41151)','Co-located · primary','none','> 63% AEP'],['Pescadero Town Ridge (PCCC1)','7.8 mi E','none','> 63% AEP'],['La Honda (LAH)','7.9 mi NE','none','> 63% AEP'],['Saratoga Gap (SSUC1)','Headwaters','none','> 63% AEP']]},
+    {name:'Butano Creek',place:'Pescadero',color:'none',aep:'> 63% AEP',limited:true,stage:'41152 · 41153',
+     flag:'Coverage gap: no rain gauge in the upper Butano watershed.',
+     gauges:[['Butano Creek near Cloverdale (41152)','Co-located · primary','none','> 63% AEP'],['Butano Creek at Pescadero Rd (41153)','Co-located','none','> 63% AEP'],['Pescadero Town Ridge (PCCC1)','7.6 mi NE','none','> 63% AEP']]}
+  ];
+
+  function el(tag, attrs, html){ var e=document.createElement(tag); if(attrs) for(var k in attrs) e.setAttribute(k, attrs[k]); if(html!=null) e.innerHTML=html; return e; }
+  function esc(s){ return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
+
+  // Public legend + cards
+  var pl = document.getElementById('pub-legend');
+  [['none','Typical rain for a storm here — happens most years.'],['yellow','About a 40–60% chance in any given year.'],['orange','About a 20–40% chance in any given year.'],['severe','About a 20% chance or less in any given year.']]
+  .forEach(function(x){ var p=P[x[0]]; pl.appendChild(el('div',{'class':'lg'},'<span class="sw" style="background:'+p.bg+'"></span><div><b>'+esc(p.name)+'</b><span>'+esc(x[1])+'</span></div>')); });
+  var pc = document.getElementById('pub-cards');
+  creeks.forEach(function(c){
+    var p=P[pubLevel(c.color)];
+    var what = c.pub || 'Rain so far is normal for a storm here.';
+    var h = '<div class="head"><h3>'+esc(c.name)+'</h3><div class="place">'+esc(c.place)+'</div></div>'+
+      '<div class="pill" style="background:'+p.bg+';color:'+p.fg+'"><strong>'+esc(p.name)+'</strong><span>'+esc(c.chance||'')+'</span></div>'+
+      '<div class="body"><p>'+esc(what)+'</p><p class="todo"><b>What to do:</b> '+esc(p.todo)+'</p></div>'+
+      (c.limited ? '<div class="foot">Limited rain data for this creek — check local conditions.</div>' : '');
+    pc.appendChild(el('article',{'class':'card pub'},h));
+  });
+
+  // Staff legend + cards
+  var sl = document.getElementById('staff-legend');
+  [['none','> 63% AEP'],['yellow','63–39% AEP'],['orange','39–18% AEP'],['red','18–10% AEP'],['purple','10–4% AEP'],['magenta','≤ 4% AEP']]
+  .forEach(function(x){ var t=C[x[0]]; sl.appendChild(el('div',{'class':'lg'},'<span class="sw" style="background:'+t.bg+'"></span><div><b>'+esc(t.name)+'</b><span>'+esc(x[1])+'</span></div>')); });
+  var sc = document.getElementById('staff-cards');
+  creeks.forEach(function(c){
+    var t=C[c.color];
+    var g = c.gauges.map(function(x){ return '<div class="g"><span class="dot" style="background:'+C[x[2]].bg+'"></span><div class="nm"><b>'+esc(x[0])+'</b><span>'+esc(x[1])+'</span></div><span class="mono">'+esc(x[3])+'</span></div>'; }).join('');
+    var h = '<div class="band" style="background:'+t.bg+';color:'+t.fg+'"><div><h3>'+esc(c.name)+'</h3><div style="font-size:13px;opacity:.9">'+esc(c.place)+'</div></div>'+
+      '<div class="lvl"><b>'+esc(t.name)+'</b><span class="mono">'+esc(c.aep)+'</span></div></div>'+
+      '<div class="sec"><span class="lab">Driving the color</span><div class="drv">'+esc(c.driver||'No duration above the 1-yr (63% AEP) storm')+'</div>'+
+      (c.confirm ? '<div style="font-size:13px;color:#3A4756">'+esc(c.confirm)+'</div>' : '')+'</div>'+
+      '<div class="gauges"><div class="lab" style="padding-bottom:6px">Rain gauges</div>'+g+'</div>'+
+      '<div class="foot"><div style="display:flex;justify-content:space-between;gap:8px"><span>Stage <span class="mono">'+esc(c.stage)+'</span></span><span>Rate-of-rise: not yet set</span></div>'+
+      (c.flag ? '<div class="flag">'+esc(c.flag)+'</div>' : '')+'</div>';
+    sc.appendChild(el('article',{'class':'card staff'},h));
+  });
+
+  // Tabs
+  var tabs = {pub:[document.getElementById('t-pub'),document.getElementById('v-pub')], staff:[document.getElementById('t-staff'),document.getElementById('v-staff')]};
+  function show(k){
+    for (var n in tabs){ var on = n===k; tabs[n][0].setAttribute('aria-selected', on?'true':'false'); tabs[n][1].hidden = !on; }
+    document.getElementById('title').textContent = k==='pub' ? 'How hard is it raining near my creek?' : 'Creek rainfall status — staff view';
+    document.getElementById('sub').hidden = k!=='pub';
+    try { history.replaceState(null,'', k==='pub' ? '#public' : '#staff'); } catch(e){}
+  }
+  tabs.pub[0].addEventListener('click', function(){ show('pub'); });
+  tabs.staff[0].addEventListener('click', function(){ show('staff'); });
+  if (location.hash === '#staff') show('staff');
+})();
+</script>
+</body>
+</html>
