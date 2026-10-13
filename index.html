@@ -50,6 +50,19 @@
   .g .nm{flex-grow:1;min-width:0;display:flex;flex-direction:column}
   .g .nm b{font-weight:500;font-size:14px}.g .nm span{font-size:12px;color:var(--muted)}
   .flag{font-size:12px;color:#8A4B00;background:#FFF4E5;border:1px solid #F3D3A6;border-radius:4px;padding:6px 8px;line-height:1.4;margin-top:6px}
+  .summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-top:24px}
+  .sum{border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:2px}
+  .sum b{font-size:30px;line-height:1}.sum span{font-size:15px;font-weight:600}.sum small{font-size:13px;opacity:.85}
+  .tbl-wrap{overflow-x:auto;margin:16px 0 28px;background:var(--card);border:1px solid var(--line);border-radius:12px}
+  .tbl{width:100%;border-collapse:collapse;min-width:760px;font-size:15px}
+  .tbl th{text-align:left;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600;padding:12px 14px;border-bottom:1px solid var(--line);background:var(--panel)}
+  .tbl td{padding:12px 14px;border-bottom:1px solid #ECEFF3;vertical-align:top}
+  .tbl tr:last-child td{border-bottom:0}
+  .tbl .cn b{display:block;font-size:16px}.tbl .cn span{font-size:13px;color:var(--muted)}
+  .chip{display:inline-block;border-radius:6px;padding:4px 10px;font-weight:700;font-size:14px;white-space:nowrap}
+  .big{font-size:18px;font-weight:600}
+  .sm{display:block;font-size:13px;color:var(--muted)}
+  .gap{font-size:13px;color:#8A4B00}
   footer{padding:0 0 40px;font-size:14px;line-height:1.5;color:var(--soft)}
   footer p{margin:0 0 8px}
   [hidden]{display:none!important}
@@ -75,10 +88,14 @@
     <div class="grid" id="pub-cards"></div>
   </section>
   <section id="v-staff" role="tabpanel" aria-labelledby="t-staff" hidden>
-    <h2>Annual exceedance probability (AEP) of rainfall at each gauge</h2>
-    <div class="legend" id="staff-legend"></div>
-    <p class="note">Card color = most extreme duration across the creek's linked gauges. Red and above needs a second gauge at orange or higher; otherwise the card is marked “single gauge — unconfirmed.”</p>
-    <div class="grid" id="staff-cards"></div>
+    <div class="summary" id="staff-summary"></div>
+    <p class="note">Same levels as the public page. Each creek takes the heaviest rain at any of its rain gauges. <b>Chance in any year</b> is the annual exceedance probability (AEP) of that rain. Severe needs at least two gauges agreeing.</p>
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead><tr><th scope="col">Creek</th><th scope="col">Level</th><th scope="col">Chance in any year</th><th scope="col">Heaviest rain</th><th scope="col">Gauges elevated</th><th scope="col">Notes</th></tr></thead>
+        <tbody id="staff-rows"></tbody>
+      </table>
+    </div>
   </section>
 </main>
 
@@ -177,29 +194,39 @@
     pc.appendChild(el('article',{'class':'card pub'},h));
   });
 
-  // Staff legend + cards
-  var sl = document.getElementById('staff-legend');
-  [['none','> 63% AEP'],['yellow','63–39% AEP'],['orange','39–18% AEP'],['red','18–10% AEP'],['purple','10–4% AEP'],['magenta','≤ 4% AEP']]
-  .forEach(function(x){ var t=C[x[0]]; sl.appendChild(el('div',{'class':'lg'},'<span class="sw" style="background:'+t.bg+'"></span><div><b>'+esc(t.name)+'</b><span>'+esc(x[1])+'</span></div>')); });
-  var sc = document.getElementById('staff-cards');
+  // Staff: summary counts + one table row per creek, same four levels as public
+  var order = ['severe','orange','yellow','none'];
+  var counts = {severe:0,orange:0,yellow:0,none:0};
+  creeks.forEach(function(c){ counts[pubLevel(c.color)]++; });
+  var ss = document.getElementById('staff-summary');
+  var sumText = {severe:'18% or less chance / yr', orange:'18–39% chance / yr', yellow:'39–63% chance / yr', none:'More common than 63% / yr'};
+  order.forEach(function(k){ var p=P[k];
+    ss.appendChild(el('div',{'class':'sum',style:'background:'+p.bg+';color:'+p.fg},'<b>'+counts[k]+'</b><span>'+esc(p.name)+'</span><small>'+esc(sumText[k])+'</small>'));
+  });
+  var rows = document.getElementById('staff-rows');
   creeks.forEach(function(c){
-    var t=C[c.color];
-    var g = c.gauges.map(function(x){ return '<div class="g"><span class="dot" style="background:'+C[x[2]].bg+'"></span><div class="nm"><b>'+esc(x[0])+'</b><span>'+esc(x[1])+'</span></div><span class="mono">'+esc(x[3])+'</span></div>'; }).join('');
-    var h = '<div class="band" style="background:'+t.bg+';color:'+t.fg+'"><div><h3>'+esc(c.name)+'</h3><div style="font-size:13px;opacity:.9">'+esc(c.place)+'</div></div>'+
-      '<div class="lvl"><b>'+esc(t.name)+'</b><span class="mono">'+esc(c.aep)+'</span></div></div>'+
-      '<div class="sec"><span class="lab">Driving the color</span><div class="drv">'+esc(c.driver||'No duration above the 1-yr (63% AEP) storm')+'</div>'+
-      (c.confirm ? '<div style="font-size:13px;color:#3A4756">'+esc(c.confirm)+'</div>' : '')+'</div>'+
-      '<div class="gauges"><div class="lab" style="padding-bottom:6px">Rain gauges</div>'+g+'</div>'+
-      '<div class="foot"><div style="display:flex;justify-content:space-between;gap:8px"><span>Stage <span class="mono">'+esc(c.stage)+'</span></span><span>Rate-of-rise: not yet set</span></div>'+
-      (c.flag ? '<div class="flag">'+esc(c.flag)+'</div>' : '')+'</div>';
-    sc.appendChild(el('article',{'class':'card staff'},h));
+    var p = P[pubLevel(c.color)];
+    var elevated = c.gauges.filter(function(x){ return x[2] !== 'none'; }).length;
+    var pct = c.color==='none' ? '—' : c.aep.replace(' AEP','');
+    var heavy = c.driver ? c.driver.split(' at ') : null;
+    var gapNote = c.limited ? 'Data gap: no rain gauge in the upper watershed' : '';
+    if (c.name==='San Mateo Creek') gapNote = 'Reservoir controls most of the flow';
+    if (c.name==='Pilarcitos Creek') gapNote = 'Data gap: no gauge in the lower watershed';
+    if (c.name==='Pescadero Creek') gapNote = 'Data gap: hillside rain gauges are 5–8 miles away';
+    var h = '<td class="cn"><b>'+esc(c.name)+'</b><span>'+esc(c.place)+'</span></td>'+
+      '<td><span class="chip" style="background:'+p.bg+';color:'+p.fg+'">'+esc(p.name)+'</span></td>'+
+      '<td><span class="big">'+esc(pct)+'</span></td>'+
+      '<td>'+(heavy ? '<span>'+esc(heavy[0])+'</span><span class="sm">at '+esc(heavy[1])+'</span>' : '<span class="sm">Nothing above normal</span>')+'</td>'+
+      '<td><span class="big">'+elevated+'</span> <span style="color:var(--muted)">of '+c.gauges.length+'</span></td>'+
+      '<td>'+(gapNote ? '<span class="gap">'+esc(gapNote)+'</span>' : '')+'</td>';
+    rows.appendChild(el('tr',null,h));
   });
 
   // Tabs
   var tabs = {pub:[document.getElementById('t-pub'),document.getElementById('v-pub')], staff:[document.getElementById('t-staff'),document.getElementById('v-staff')]};
   function show(k){
     for (var n in tabs){ var on = n===k; tabs[n][0].setAttribute('aria-selected', on?'true':'false'); tabs[n][1].hidden = !on; }
-    document.getElementById('title').textContent = k==='pub' ? 'How hard is it raining near my creek?' : 'Creek rainfall status — staff view';
+    document.getElementById('title').textContent = k==='pub' ? 'How hard is it raining near my creek?' : 'Creek rainfall — staff summary';
     document.getElementById('sub').hidden = k!=='pub';
     try { history.replaceState(null,'', k==='pub' ? '#public' : '#staff'); } catch(e){}
   }
