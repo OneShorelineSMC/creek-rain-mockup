@@ -7,11 +7,13 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root{--ink:#16202B;--muted:#556274;--soft:#3A4756;--line:#D5DAE1;--bg:#F4F5F7;--card:#FFFFFF;--panel:#F6F7F9;--rain:#2F5FB3;--link:#1F4E79;--watch:#B04A00;--warn:#B50909}
+  :root{--ink:#16202B;--muted:#556274;--soft:#3A4756;--line:#D5DAE1;--bg:#F4F5F7;--card:#FFFFFF;--panel:#F6F7F9;--link:#1F4E79;
+        --monitor:#FFBE2E;--monitor-edge:#B88A00;--watch:#DB6A0C;--warn:#B50909}
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
   a{color:var(--link)}a:hover{color:#163A5A}
   .wrap{max-width:1240px;margin:0 auto;padding:0 16px}
+  button{font:inherit}
 
   header{background:var(--ink);color:#F4F6F8;padding:12px 0}
   header .wrap{display:flex;flex-wrap:wrap;gap:4px 16px;align-items:baseline;justify-content:space-between}
@@ -22,77 +24,95 @@
   .staffbadge{background:#F4F6F8;color:var(--ink);font-weight:700;padding:2px 8px;border-radius:4px}
 
   .bar{position:sticky;top:0;z-index:5;background:rgba(244,245,247,.97);backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
-  .bar .wrap{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;justify-content:space-between;padding-top:8px;padding-bottom:8px}
+  .bar .wrap{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:space-between;padding-top:8px;padding-bottom:8px}
+  .where{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+  .where label{font-size:16px;font-weight:700}
+  select{font:inherit;font-size:16px;min-height:44px;padding:6px 10px;border:2px solid var(--ink);border-radius:8px;background:#FFFFFF;color:var(--ink)}
+  .btn{min-height:44px;padding:8px 12px;border:1px solid var(--line);border-radius:8px;background:#FFFFFF;color:var(--link);font-size:15px;font-weight:600;cursor:pointer}
   .ctl{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--soft);font-weight:600}
-  select{font:inherit;font-size:15px;min-height:40px;padding:6px 10px;border:1px solid var(--line);border-radius:8px;background:#FFFFFF;color:var(--ink)}
   .seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#FFFFFF}
-  .seg button{font:inherit;font-size:14px;font-weight:600;padding:8px 12px;min-height:40px;border:0;background:transparent;color:var(--soft);cursor:pointer}
+  .seg button{font-size:14px;font-weight:600;padding:8px 12px;min-height:44px;border:0;background:transparent;color:var(--soft);cursor:pointer}
   .seg button+button{border-left:1px solid var(--line)}
   .seg button[aria-pressed="true"]{background:var(--ink);color:#FFFFFF}
 
-  .alert{margin-top:16px;background:var(--warn);color:#FFFFFF;border-radius:12px;padding:14px 16px;font-size:17px;line-height:1.45}
-  .alert a{color:#FFFFFF;font-weight:700}
+  .banner{margin-top:16px;background:var(--warn);color:#FFFFFF;border-radius:12px;padding:14px 16px;font-size:18px;line-height:1.45}
+  .banner a{color:#FFFFFF;font-weight:700}
   .glance{margin-top:12px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
-  .glance p{margin:0;font-size:17px;line-height:1.55}
-  .filtered{margin-top:8px;font-size:14px;color:var(--soft)}
+  .glance .main{margin:0;font-size:20px;line-height:1.45;font-weight:600}
+  .glance .sub{margin:8px 0 0;font-size:15px;line-height:1.5;color:var(--soft)}
+  .glance .loc{font-size:14px;color:var(--muted);margin-top:8px}
   details.more{margin-top:10px}
-  details.more summary{cursor:pointer;font-size:15px;font-weight:600;color:var(--link);min-height:40px;display:flex;align-items:center}
+  details.more summary,.quiet summary{cursor:pointer;font-size:15px;font-weight:600;color:var(--link);min-height:44px;display:flex;align-items:center}
   .explain{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-top:4px}
   .explain div{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;font-size:15px;line-height:1.5;color:var(--soft)}
   .explain h3{margin:0 0 6px;font-size:16px;color:var(--ink)}
   .explain p{margin:0 0 6px}
+  .vlist{list-style:none;padding:0;margin:0}
+  .vlist li{display:flex;gap:8px;align-items:flex-start;margin-bottom:6px}
 
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;padding:16px 0 24px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;padding:16px 0 8px}
+  .quiet{margin:8px 0 24px}
+  .quiet summary{font-size:16px}
   .card{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
-  .card.watch{border:4px solid var(--watch)}
-  .card.warning{border:4px solid var(--warn)}
-  .card.severe{border:3px solid var(--ink)}
+  .card.likely{border:4px solid var(--warn)}
+  .card.ready{border:4px solid var(--watch)}
+  .card.alert{border:4px solid var(--monitor-edge)}
+  .card.nodata{border:2px dashed #8995A5}
   .head{padding:14px 16px 10px}
   .card h3{margin:0;font-size:20px}
   .place{font-size:14px;color:var(--muted)}
-  .rows{margin:0 16px;border-top:1px solid #ECEFF3}
-  .r{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #ECEFF3;font-size:15px}
-  .r .lbl{color:var(--muted)}
-  .r .val{font-weight:700;display:inline-flex;align-items:center;gap:8px;text-align:right}
-  .tag{border-radius:6px;padding:3px 10px;font-weight:700}
-  .tag.watch{background:var(--watch);color:#FFFFFF}
-  .tag.warning{background:var(--warn);color:#FFFFFF}
-  .meter{display:inline-flex;gap:3px;align-items:flex-end}
-  .meter i{display:block;width:6px;border-radius:2px;background:#D5DAE1}
-  .meter i:nth-child(1){height:8px}.meter i:nth-child(2){height:12px}.meter i:nth-child(3){height:16px}
-  .meter i:not(.on){background:rgba(0,0,0,.15)}
-  .rchip{display:inline-flex;align-items:center;gap:8px;border-radius:6px;padding:3px 10px;font-weight:700}
-  .rchip.heavy{background:#FAF3D1;color:var(--ink)}  .rchip.heavy .meter i.on{background:#936F38}
-  .rchip.vheavy{background:#FCE8D6;color:var(--ink)} .rchip.vheavy .meter i.on{background:var(--watch)}
-  .rchip.severe{background:#F8DEDB;color:var(--ink)} .rchip.severe .meter i.on{background:var(--warn)}
-  /* Threshold band for creeks with flood levels */
-  .band{margin:0 16px 4px;padding:10px 0 4px}
-  .band-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-size:15px;margin-bottom:8px}
-  .band-top .lbl{color:var(--muted)}
-  .band-top .now{font-weight:700}
-  .track{position:relative;display:flex;height:14px;border-radius:7px;overflow:visible}
-  .track .s{height:100%}
-  .track .s:first-child{border-radius:7px 0 0 7px}.track .s:last-child{border-radius:0 7px 7px 0}
-  .track .s.n{background:#E3E7EC}.track .s.w{background:#F3D9C6}.track .s.x{background:#F3CFCC}
-  .track .s.n.on{background:#8995A5}.track .s.w.on{background:var(--watch)}.track .s.x.on{background:var(--warn)}
-  .mark{position:absolute;top:-5px;width:4px;height:24px;margin-left:-2px;background:var(--ink);border-radius:2px;box-shadow:0 0 0 2px #FFFFFF}
-  .ticks{display:flex;font-size:12px;color:var(--muted);margin-top:6px}
-  .ticks span{text-align:center}.ticks span.on{color:var(--ink);font-weight:700}
-  .body{padding:12px 16px 14px;display:flex;flex-direction:column;gap:8px}
-  .body p{margin:0;font-size:15px;line-height:1.5}
-  .todo{color:var(--soft)}.todo b{color:var(--ink)}
+  .verdict{margin:0 16px;padding:10px 12px;border-radius:8px;display:flex;align-items:center;gap:10px;font-size:20px;font-weight:700}
+  .verdict .ic{width:14px;height:14px;border-radius:3px;flex-shrink:0}
+  .verdict.likely{background:var(--warn);color:#FFFFFF}.verdict.likely .ic{background:#FFFFFF}
+  .verdict.ready{background:#FCE8D6}.verdict.ready .ic{background:var(--watch)}
+  .verdict.alert{background:#FAF3D1}.verdict.alert .ic{background:var(--monitor)}
+  .verdict.none{background:var(--panel);font-weight:600;font-size:18px}.verdict.none .ic{background:#B9C1CC}
+  .verdict.nodata{background:var(--panel);font-weight:600;font-size:18px}.verdict.nodata .ic{background:transparent;border:2px dashed #8995A5}
+  .why{margin:8px 16px 0;font-size:15px;line-height:1.45;color:var(--soft)}
+  .body{padding:10px 16px 12px;display:flex;flex-direction:column;gap:8px}
+  .body p{margin:0;font-size:16px;line-height:1.5}
+  .todo b{color:var(--ink)}
   .danger{font-weight:700;color:#8E2219}
-  .act{margin:0 16px 14px;display:flex;align-items:center;justify-content:space-between;min-height:44px;padding:8px 12px;border:1px solid var(--line);border-radius:8px;text-decoration:none;font-size:15px;font-weight:600;color:var(--link)}
+  .act{margin:0 16px 12px;display:flex;align-items:center;justify-content:space-between;min-height:44px;padding:8px 12px;border:2px solid var(--link);border-radius:8px;text-decoration:none;font-size:15px;font-weight:700;color:var(--link)}
+  .details{margin:0 16px 12px;border-top:1px solid #ECEFF3}
+  .details .dh{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding:10px 0 2px}
+  .r{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid #ECEFF3;font-size:15px}
+  .r:last-child{border-bottom:0}
+  .r .lbl{color:var(--muted)}
+  .r .val{font-weight:600;display:inline-flex;align-items:center;gap:8px;text-align:right}
+  .meter{display:inline-flex;gap:3px;align-items:flex-end}
+  .meter i{display:block;width:6px;border-radius:2px;background:rgba(0,0,0,.15)}
+  .meter i:nth-child(1){height:8px}.meter i:nth-child(2){height:12px}.meter i:nth-child(3){height:16px}
+  .rchip{display:inline-flex;align-items:center;gap:8px;border-radius:6px;padding:3px 10px;font-weight:700}
+  .rchip.heavy{background:#FAF3D1}.rchip.heavy .meter i.on{background:#936F38}
+  .rchip.vheavy{background:#FCE8D6}.rchip.vheavy .meter i.on{background:var(--watch)}
+  .rchip.severe{background:#F8DEDB}.rchip.severe .meter i.on{background:var(--warn)}
+  .band{padding:8px 0 10px;border-bottom:1px solid #ECEFF3}
+  .band-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-size:15px;margin-bottom:8px}
+  .band-top .lbl{color:var(--muted)}.band-top .now{font-weight:600}
+  .track{position:relative;display:flex;gap:2px;height:14px}
+  .track .s{height:100%;background:#E3E7EC}
+  .track .s:first-child{border-radius:7px 0 0 7px}.track .s:last-child{border-radius:0 7px 7px 0}
+  .track .s.n.on{background:#8995A5}.track .s.m.on{background:var(--monitor)}.track .s.w.on{background:var(--watch)}.track .s.x.on{background:var(--warn)}
+  .mark{position:absolute;top:-5px;width:4px;height:24px;margin-left:-2px;background:var(--ink);border-radius:2px;box-shadow:0 0 0 2px #FFFFFF}
+  .ticks{display:flex;font-size:13px;color:var(--soft);margin-top:6px}
+  .ticks span{text-align:center}.ticks span.on{color:var(--ink);font-weight:700}
   .foot{margin-top:auto;padding:9px 16px;background:var(--panel);border-top:1px solid #E3E7EC;font-size:13px;color:var(--muted);display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
   .foot a{font-weight:600}
-  .empty{padding:24px;background:var(--card);border:1px solid var(--line);border-radius:12px;font-size:16px}
+  .empty{padding:24px;background:var(--card);border:1px solid var(--line);border-radius:12px;font-size:16px;margin-top:16px}
 
   .tbl-wrap{overflow-x:auto;margin:16px 0 24px;background:var(--card);border:1px solid var(--line);border-radius:12px}
-  .tbl{width:100%;border-collapse:collapse;min-width:980px;font-size:14px}
+  .tbl{width:100%;border-collapse:collapse;min-width:1080px;font-size:14px}
   .tbl th{text-align:left;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600;padding:10px 12px;border-bottom:1px solid var(--line);background:var(--panel)}
   .tbl td{padding:10px 12px;border-bottom:1px solid #ECEFF3;vertical-align:top}
   .tbl tr:last-child td{border-bottom:0}
   .tbl .cn b{display:block;font-size:15px}.tbl .cn span{font-size:12px;color:var(--muted)}
+  .tag{border-radius:6px;padding:3px 10px;font-weight:700;white-space:nowrap}
+  .tag.monitor{background:var(--monitor);color:var(--ink)}
+  .tag.watch{background:#FFFFFF;color:var(--ink);box-shadow:inset 0 0 0 2px var(--watch)}
+  .tag.warning{background:var(--warn);color:#FFFFFF}
+  .vtag{display:inline-flex;align-items:center;gap:6px;font-weight:700;white-space:nowrap}
+  .vtag i{width:12px;height:12px;border-radius:3px;display:inline-block}
   .sm{display:block;font-size:12px;color:var(--muted)}
   .gap{font-size:12px;color:#8A4B00}
   .dim{color:var(--muted)}
@@ -107,13 +127,17 @@
 <header>
   <div class="wrap">
     <h1><span class="org">OneShoreline · San Mateo County Flood &amp; Sea Level Rise Resiliency District</span>San Mateo County Creek Conditions</h1>
-    <div class="meta"><span id="staffbadge" class="staffbadge" hidden>STAFF VIEW</span><span>Wed, Oct 14 · Updated 10:15 AM</span><span class="sample">MOCKUP — sample storm</span></div>
+    <div class="meta"><span id="staffbadge" class="staffbadge" hidden>STAFF VIEW</span><span>Wed, Oct 14 · Updated 10:15 AM · Updates every 15 minutes</span><span class="sample">MOCKUP — sample storm</span></div>
   </div>
 </header>
 
 <div class="bar">
   <div class="wrap">
-    <label class="ctl" for="area">Find your area <select id="area"></select></label>
+    <div class="where">
+      <label for="area">Your area</label>
+      <select id="area"></select>
+      <button class="btn" id="locate" type="button">Use my location</button>
+    </div>
     <div class="ctl"><span id="sortlbl">Sort</span>
       <div class="seg" role="group" aria-labelledby="sortlbl">
         <button id="s-risk" aria-pressed="true">Most urgent first</button>
@@ -124,31 +148,43 @@
 </div>
 
 <main class="wrap">
-  <div id="alert" class="alert" role="alert" hidden></div>
+  <div id="alert" class="banner" role="alert" hidden></div>
 
-  <section class="glance" aria-label="At a glance">
-    <p id="summary"></p>
-    <div class="filtered" id="filtered" hidden></div>
+  <section class="glance" aria-label="At a glance" aria-live="polite">
+    <p class="main" id="summary"></p>
+    <p class="sub" id="summary-sub"></p>
+    <div class="loc" id="loc-msg" hidden></div>
   </section>
 
   <details class="more">
     <summary>How to read this page</summary>
     <div class="explain">
-      <div><h3>Creek level</h3><p>Measured in the creek. Every card shows whether the water is <b>rising fast</b>, <b>rising</b>, <b>steady</b> or <b>falling</b>.</p><p>Creeks with flood levels show a band — Normal, Watch, Warning — with a marker at the current level. <b>Watch</b> (orange frame): the creek is rising toward flooding. <b>Warning</b> (red frame): flooding is likely or happening. On creeks without flood levels yet, a creek rising fast gets a bold black frame.</p><p>These are separate from National Weather Service alerts. Follow whichever is more serious.</p></div>
-      <div><h3>Rain upstream</h3><p>How unusual the rain is in the hills above the creek. More bars means heavier rain: <b>Heavy</b> (yellow), <b>Very heavy</b> (orange), <b>Severe</b> (red). Rain colors describe the rain only — a card's frame shows its overall status. Creeks without flood levels get a bold black frame when rain is severe.</p><p>Rain is not the same as flooding, but heavy rain can make creeks rise quickly.</p></div>
-      <div><h3>Tide</h3><p>For creeks near the Bay. When the tide is <b>rising</b>, water drains more slowly and low areas can flood more easily.</p></div>
+      <div><h3>The status at the top of each card</h3>
+        <ul class="vlist">
+          <li><span class="sw" style="width:14px;height:14px;border-radius:3px;background:var(--warn);flex-shrink:0;margin-top:4px"></span><span><b>Flooding likely</b> — move away from the creek and low areas now.</span></li>
+          <li><span class="sw" style="width:14px;height:14px;border-radius:3px;background:var(--watch);flex-shrink:0;margin-top:4px"></span><span><b>Be ready</b> — the creek could flood. Be ready to move to higher ground.</span></li>
+          <li><span class="sw" style="width:14px;height:14px;border-radius:3px;background:var(--monitor);flex-shrink:0;margin-top:4px"></span><span><b>Stay alert</b> — conditions are worsening. Avoid creek banks and check back often.</span></li>
+          <li><span class="sw" style="width:14px;height:14px;border-radius:3px;background:#B9C1CC;flex-shrink:0;margin-top:4px"></span><span><b>No alerts</b> — nothing unusual right now. Conditions can change quickly.</span></li>
+        </ul>
+      </div>
+      <div><h3>Why a creek has its status</h3><p>Some creeks have flood levels set: <b>Monitor</b>, <b>Watch</b> and <b>Warning</b>, shown on a bar with a marker at the current level.</p><p>Every creek also shows whether the water is rising or falling, how heavy the rain is in the hills above it, and — near the Bay — whether a rising tide is slowing drainage.</p></div>
+      <div><h3>Other alerts</h3><p>This page shows creek conditions measured by OneShoreline. It is separate from National Weather Service alerts — follow whichever is more serious.</p></div>
     </div>
   </details>
 
   <section id="v-pub">
     <div class="grid" id="pub-cards"></div>
+    <details class="quiet" id="quiet" hidden>
+      <summary id="quiet-sum"></summary>
+      <div class="grid" id="quiet-cards"></div>
+    </details>
   </section>
 
   <section id="v-staff" hidden>
-    <p class="staffnote">Staff view — not linked from the public page. <a href="#" id="to-public">Open public view</a>. Official creek level comes from the creek dashboards and always takes priority. Every creek shows its stage trend and rate (ft/hr, sample values); "Rising fast" uses an interim rate-of-rise threshold to be set per gauge. <b>Chance in any year</b> = annual exceedance probability (AEP) of the heaviest rain at any of the creek's gauges. Severe rain needs two gauges agreeing.</p>
+    <p class="staffnote">Staff view — not linked from the public page. <a href="#" id="to-public">Open public view</a>. Verdict logic: Warning → Flooding likely; Watch, or (no flood level) rising fast / severe rain → Be ready; Monitor, very heavy rain, severe rain on a creek at Normal, or heavy rain + rising tide → Stay alert. Rates and positions are sample values.</p>
     <div class="tbl-wrap">
       <table class="tbl">
-        <thead><tr><th scope="col">Creek</th><th scope="col">Creek level</th><th scope="col">Rain upstream</th><th scope="col">Chance in any year</th><th scope="col">Heaviest rain</th><th scope="col">Gauges elevated</th><th scope="col">Tide</th><th scope="col">Data</th><th scope="col">Notes</th></tr></thead>
+        <thead><tr><th scope="col">Creek</th><th scope="col">Public verdict</th><th scope="col">Creek level</th><th scope="col">Rain upstream</th><th scope="col">Chance in any year</th><th scope="col">Heaviest rain</th><th scope="col">Gauges elevated</th><th scope="col">Tide</th><th scope="col">Data</th><th scope="col">Notes</th></tr></thead>
         <tbody id="staff-rows"></tbody>
       </table>
     </div>
@@ -157,7 +193,7 @@
 
 <footer class="wrap">
   <p><b>If you are in danger, call 911.</b> Never walk or drive through moving water.</p>
-  <p>Check your evacuation zone and its status on <a id="genasys-foot" href="#">Genasys Protect</a>.</p>
+  <p>See if your area has an evacuation order on <a id="genasys-foot" href="#">Genasys Protect</a>.</p>
 </footer>
 
 <script>
@@ -165,196 +201,221 @@
   var NOW = '10:15 AM';
   var GENASYS = 'https://protect.genasys.com/';
 
-  var O = {
-    normal:  {name:'Normal', todo:'No action needed. Check back during the storm.'},
-    watch:   {name:'Watch', todo:'The creek is rising. Stay away from it and be ready to move to higher ground.'},
-    warning: {name:'Warning', todo:'Flooding is likely or happening. Follow instructions from local officials.'}
-  };
+  // ---------- Inputs ----------
+  var O = {normal:'Normal', monitor:'Monitor', watch:'Watch', warning:'Warning'};
   var R = {
-    none:   {bars:0, name:'No rain alerts', todo:'Conditions can change quickly. Check back during the storm.'},
-    heavy:  {bars:1, name:'Heavy', todo:'Stay aware and keep away from creek banks.'},
-    vheavy: {bars:2, name:'Very heavy', todo:'Watch for street flooding. Avoid low spots and creek crossings.'},
-    severe: {bars:3, name:'Severe', todo:'Be ready to act. Stay away from the creek and follow local alerts.'},
-    stale:  {bars:0, name:'No recent data', todo:'Check local conditions and official alerts.'}
+    none:{bars:0,name:'Normal'}, heavy:{bars:1,name:'Heavy'}, vheavy:{bars:2,name:'Very heavy'},
+    severe:{bars:3,name:'Severe'}, stale:{bars:0,name:'No recent data'}
   };
   function rainLevel(c){ if (c.stale) return 'stale'; return {none:'none',yellow:'heavy',orange:'vheavy',red:'severe',purple:'severe',magenta:'severe'}[c.rain]; }
+  var TR = {fast:{a:'↑↑',w:'Rising fast'}, rising:{a:'↑',w:'Rising'}, steady:{a:'→',w:'Steady'}, falling:{a:'↓',w:'Falling'}};
 
   // Sample tide — one Bayside tide for all tidal creeks until each creek's tide gauge is set.
-  var TIDE = {dir:'rising', next:'high tide at 11:40 AM', staff:'Rising · high 11:40 AM · 6.8 ft · surge +0.8 ft'};
+  var TIDE = {dir:'rising', until:'11:40 AM', staff:'Rising · high 11:40 AM · 6.8 ft · surge +0.8 ft'};
 
   // Sample storm — illustrative. Rain levels computed against each gauge's Atlas 14 table;
-  // official creek levels and the offline gauge are made up to show each state.
+  // official levels, stage positions/trends and the offline gauge are made up to show each state.
   var creeks = [
-    {name:'San Bruno Creek',pos:0.84,trend:'rising',rate:'+0.6',place:'San Bruno',region:'bay',tidal:1,dash:'warning',rain:'orange',aep:'28%',
+    {name:'San Bruno Creek',place:'San Bruno',region:'bay',tidal:1,dash:'warning',pos:0.86,trend:'rising',rate:'+0.6',rain:'orange',aep:'28%',
      driver:'3 hr: 1.07 in at San Bruno Creek gauge',up:2,of:2,note:'Creek at Warning with rain only very heavy — likely tide'},
-    {name:'Belmont Creek',pos:0.58,trend:'fast',rate:'+1.1',place:'Belmont, San Carlos',region:'bay',dash:'watch',rain:'purple',aep:'9%',
+    {name:'Belmont Creek',place:'Belmont, San Carlos',region:'bay',dash:'watch',pos:0.64,trend:'fast',rate:'+1.1',rain:'purple',aep:'9%',
      driver:'1 hr: 0.75 in at Belmont Creek gauge',up:3,of:3,note:'Confirm Pulgas gauge is in this watershed'},
-    {name:'Atherton Channel',pos:0.28,trend:'rising',rate:'+0.3',place:'Atherton, Redwood City, Menlo Park',region:'bay',dash:'normal',rain:'red',aep:'15%',
-     driver:'3 hr: 1.94 in at Huddart Park',up:4,of:4,note:'Creek still normal — rain gives lead time'},
-    {name:'Colma Creek',pos:0.20,trend:'steady',rate:'+0.1',place:'South San Francisco, Colma',region:'bay',tidal:1,dash:'normal',rain:'orange',aep:'33%',
+    {name:'Colma Creek',place:'South San Francisco, Colma',region:'bay',tidal:1,dash:'monitor',pos:0.45,trend:'rising',rate:'+0.2',rain:'orange',aep:'33%',
      driver:'6 hr: 1.60 in at San Bruno Mountain',up:2,of:2},
-    {name:'Redwood Creek',trend:'fast',rate:'+0.9',place:'Redwood City',region:'bay',tidal:1,rain:'red',aep:'15%',
+    {name:'Atherton Channel',place:'Atherton, Redwood City, Menlo Park',region:'bay',dash:'normal',pos:0.22,trend:'rising',rate:'+0.3',rain:'red',aep:'15%',
+     driver:'3 hr: 1.94 in at Huddart Park',up:4,of:4,note:'Creek still normal — rain gives lead time'},
+    {name:'Redwood Creek',place:'Redwood City',region:'bay',tidal:1,trend:'fast',rate:'+0.9',rain:'red',aep:'15%',
      driver:'3 hr: 1.94 in at Huddart Park',up:3,of:3},
-    {name:'Bear Creek',trend:'rising',rate:'+0.4',place:'Woodside, Portola Valley',region:'bay',rain:'red',aep:'15%',
+    {name:'Bear Creek',place:'Woodside, Portola Valley',region:'bay',trend:'rising',rate:'+0.4',rain:'red',aep:'15%',
      driver:'3 hr: 1.94 in at Huddart Park',up:2,of:2},
-    {name:'San Francisquito Creek',trend:'rising',rate:'+0.5',place:'Menlo Park, Palo Alto, East Palo Alto',region:'bay',tidal:1,rain:'orange',aep:'19%',
+    {name:'San Francisquito Creek',place:'Menlo Park, Palo Alto, East Palo Alto',region:'bay',tidal:1,trend:'rising',rate:'+0.5',rain:'orange',aep:'19%',
      driver:'3 hr: 2.14 in at Wunderlich County Park',up:3,of:3,note:'SFC and 11164500 are the same site — pick one'},
-    {name:'Los Trancos Creek',trend:'rising',rate:'+0.3',place:'Portola Valley, Palo Alto',region:'bay',rain:'orange',aep:'39%',
+    {name:'Los Trancos Creek',place:'Portola Valley, Palo Alto',region:'bay',trend:'rising',rate:'+0.3',rain:'orange',aep:'39%',
      driver:'3 hr: 1.62 in at Windy Hill',up:3,of:3},
-    {name:'San Mateo Creek',trend:'steady',rate:'0.0',place:'San Mateo, Hillsborough',region:'bay',tidal:1,rain:'orange',aep:'39%',
+    {name:'San Mateo Creek',place:'San Mateo, Hillsborough',region:'bay',tidal:1,trend:'steady',rate:'0.0',rain:'orange',aep:'39%',
      driver:'6 hr: 1.59 in at Crystal Springs Cottage',up:1,of:2,extra:'Crystal Springs Reservoir holds back much of this water.',
      note:'Reservoir controls most flow — add USGS 11162750 level vs. 294.6 ft spill'},
-    {name:'Green Hills Creek',trend:'steady',rate:'0.0',place:'Millbrae',region:'bay',tidal:1,rain:'none',up:0,of:1,limited:true,note:'Data gap: no rain gauge upslope; drains to Highline Canal'},
-    {name:'Pilarcitos Creek',trend:'steady',rate:'0.0',place:'Half Moon Bay',region:'coast',rain:'none',up:0,of:1,limited:true,note:'Data gap: no gauge in the lower watershed'},
-    {name:'San Gregorio Creek',trend:'steady',rate:'+0.1',place:'San Gregorio, La Honda',region:'coast',rain:'none',stale:'8:40 AM',up:0,of:1,note:'SAMPLE: La Honda gauge offline since 8:40 AM'},
-    {name:'Pescadero Creek',trend:'falling',rate:'-0.1',place:'Pescadero',region:'coast',rain:'none',up:0,of:4,limited:true,note:'Data gap: hillside rain gauges are 5–8 miles away'},
-    {name:'Butano Creek',trend:'steady',rate:'0.0',place:'Pescadero',region:'coast',rain:'none',up:0,of:3,limited:true,note:'Data gap: no rain gauge in the upper watershed'}
+    {name:'Green Hills Creek',place:'Millbrae',region:'bay',tidal:1,trend:'steady',rate:'0.0',rain:'none',up:0,of:1,limited:true,note:'Data gap: no rain gauge upslope; drains to Highline Canal'},
+    {name:'Pilarcitos Creek',place:'Half Moon Bay',region:'coast',trend:'steady',rate:'0.0',rain:'none',up:0,of:1,limited:true,note:'Data gap: no gauge in the lower watershed'},
+    {name:'San Gregorio Creek',place:'San Gregorio, La Honda',region:'coast',trend:'steady',rate:'+0.1',rain:'none',stale:'8:40 AM',up:0,of:1,note:'SAMPLE: La Honda rain gauge offline since 8:40 AM'},
+    {name:'Pescadero Creek',place:'Pescadero',region:'coast',trend:'falling',rate:'-0.1',rain:'none',up:0,of:4,limited:true,note:'Data gap: hillside rain gauges are 5–8 miles away'},
+    {name:'Butano Creek',place:'Pescadero',region:'coast',trend:'steady',rate:'0.0',rain:'none',up:0,of:3,limited:true,note:'Data gap: no rain gauge in the upper watershed'}
   ];
 
+  // Approximate town centers, for "Use my location" in this mockup only.
+  var TOWNS = {'Atherton':[37.461,-122.198],'Belmont':[37.520,-122.276],'Colma':[37.677,-122.460],'East Palo Alto':[37.469,-122.141],
+    'Half Moon Bay':[37.464,-122.429],'Hillsborough':[37.574,-122.379],'La Honda':[37.319,-122.274],'Menlo Park':[37.453,-122.182],
+    'Millbrae':[37.599,-122.387],'Palo Alto':[37.442,-122.143],'Pescadero':[37.255,-122.383],'Portola Valley':[37.384,-122.235],
+    'Redwood City':[37.485,-122.236],'San Bruno':[37.630,-122.411],'San Carlos':[37.507,-122.260],'San Gregorio':[37.327,-122.387],
+    'San Mateo':[37.563,-122.326],'South San Francisco':[37.655,-122.408],'Woodside':[37.430,-122.254]};
+
+  // ---------- Verdict: one plain status per creek ----------
+  var V = {
+    likely:{rank:4,label:'Flooding likely',color:'var(--warn)',todo:'Move away from the creek and low areas now. Follow instructions from local officials.'},
+    ready: {rank:3,label:'Be ready',color:'var(--watch)',todo:'Stay away from the creek. Be ready to move to higher ground if you are told to.'},
+    alert: {rank:2,label:'Stay alert',color:'var(--monitor)',todo:'Avoid creek banks, low spots and flooded streets. Check back often.'},
+    nodata:{rank:1,label:'No recent data',color:'#8995A5',todo:'Check local conditions and official alerts.'},
+    none:  {rank:0,label:'No alerts',color:'#B9C1CC',todo:'Nothing unusual right now. Conditions can change quickly during storms.'}
+  };
+  var tideRising = TIDE.dir==='rising';
+  function verdict(c){
+    var k=rainLevel(c), fast=c.trend==='fast';
+    if (c.dash==='warning') return 'likely';
+    if (c.dash==='watch') return 'ready';
+    if (!c.dash && (fast || k==='severe')) return 'ready';
+    if (c.dash==='monitor') return 'alert';
+    if (k==='severe' || k==='vheavy' || fast) return 'alert';
+    if (k==='heavy' && c.tidal && tideRising) return 'alert';
+    if (k==='stale') return 'nodata';
+    return 'none';
+  }
+  function why(c){
+    var k=rainLevel(c), p=[], v=verdict(c);
+    if (c.dash==='warning') p.push('The creek is at its Warning level.');
+    else if (c.dash==='watch') p.push('The creek is at its Watch level'+(c.trend==='fast'?' and rising fast.':'.'));
+    else if (c.dash==='monitor') p.push('The creek is higher than usual'+(c.trend==='fast'||c.trend==='rising'?' and rising.':'.'));
+    else if (c.dash==='normal' && v!=='none') p.push('The creek is still at a normal level, but '+(k==='severe'?'severe':'very heavy')+' rain upstream may make it rise.');
+    if (!c.dash && c.trend==='fast') p.push('The creek is rising fast.');
+    if (c.dash!=='normal' && v!=='none' && v!=='nodata' && (k==='severe'||k==='vheavy')) p.push((k==='severe'?'Severe':'Very heavy')+' rain in the hills above.');
+    if (c.extra && v!=='none') p.push(c.extra);
+    if (k==='stale') p.push('Our rain gauge for this creek hasn’t reported since '+c.stale+'.');
+    return p.join(' ');
+  }
+  function tideNote(c){ return c.tidal && tideRising && V[verdict(c)].rank>=2 ? 'Rising tide: water near the Bay drains slowly until about '+TIDE.until+'.' : ''; }
+
+  // ---------- Helpers ----------
   function esc(s){ return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
   function list(a){ return a.length<2 ? a.join('') : a.slice(0,-1).join(', ')+' and '+a[a.length-1]; }
+  function short(n){ return n.replace(/ Creek$/,''); }
   function meter(n){ var s='<span class="meter" aria-hidden="true">'; for (var i=1;i<=3;i++) s+='<i'+(i<=n?' class="on"':'')+'></i>'; return s+'</span>'; }
   function rchip(k){ return '<span class="rchip '+k+'">'+meter(R[k].bars)+R[k].name+'</span>'; }
-  function durWords(c){ var m=c.driver && c.driver.match(/^(\d+) hr/); if(!m) return 'past few hours'; return m[1]==='1' ? 'past hour' : 'past '+m[1]+' hours'; }
-  function isHeavy(c){ var k=rainLevel(c); return k==='vheavy'||k==='severe'; }
-  // Creek-level trend from the stream gauge (rate of rise). "Rising fast" = interim rate-of-rise threshold, to be set per gauge.
-  var TR = {fast:{a:'↑↑',w:'Rising fast'}, rising:{a:'↑',w:'Rising'}, steady:{a:'→',w:'Steady'}, falling:{a:'↓',w:'Falling'}};
   function trendTxt(c){ var t=TR[c.trend]; return '<span aria-hidden="true">'+t.a+'</span> '+t.w; }
-  function isFast(c){ return c.trend==='fast'; }
-  var BAND=[['n','Normal',45],['w','Watch',25],['x','Warning',30]];
+  function inArea(c, area){ return !area || c.place.split(',').map(function(t){return t.trim();}).indexOf(area)>=0; }
+  function score(c){ var r=V[verdict(c)].rank*100; if (c.dash==='warning') r+=50; if (c.dash==='watch') r+=40; if (c.trend==='fast') r+=10; return r + ({severe:3,vheavy:2,heavy:1}[rainLevel(c)]||0); }
+
+  var BAND=[['n','Normal',35],['m','Monitor',20],['w','Watch',20],['x','Warning',25]];
   function band(c){
-    var act={normal:'n',watch:'w',warning:'x'}[c.dash];
+    var act={normal:'n',monitor:'m',watch:'w',warning:'x'}[c.dash];
     var segs=BAND.map(function(b){return '<span class="s '+b[0]+(b[0]===act?' on':'')+'" style="flex:'+b[2]+'"></span>';}).join('');
     var ticks=BAND.map(function(b){return '<span class="'+(b[0]===act?'on':'')+'" style="flex:'+b[2]+'">'+b[1]+'</span>';}).join('');
-    return '<div class="band"><div class="band-top"><span class="lbl">Creek level</span><span class="now">'+O[c.dash].name+' · '+trendTxt(c)+'</span></div>'+
-      '<div class="track" role="img" aria-label="Creek level is in the '+O[c.dash].name+' range and '+TR[c.trend].w.toLowerCase()+'">'+segs+
+    return '<div class="band"><div class="band-top"><span class="lbl">Creek level</span><span class="now">'+O[c.dash]+' · '+trendTxt(c)+'</span></div>'+
+      '<div class="track" role="img" aria-label="Creek level is in the '+O[c.dash]+' range and '+TR[c.trend].w.toLowerCase()+'">'+segs+
       '<span class="mark" style="left:'+(c.pos*100)+'%"></span></div><div class="ticks" aria-hidden="true">'+ticks+'</div></div>';
   }
 
-  // Urgency: Warning > Watch > rain level; rising tide nudges heavy rain up; offline above quiet.
-  var RS={none:0,stale:10,heavy:30,vheavy:50,severe:70};
-  function score(c){
-    if (c.dash==='warning') return 100;
-    if (c.dash==='watch') return 90;
-    var s=RS[rainLevel(c)] + (c.tidal && TIDE.dir==='rising' && isHeavy(c) ? 5 : 0)
-         + (isFast(c) ? 15 : c.trend==='rising' ? 3 : 0);
-    return c.dash==='normal' ? s-1 : s;
-  }
-
-  document.getElementById('genasys-foot').href=GENASYS;
-
-  // Area filter
-  var towns={};
-  creeks.forEach(function(c){ c.place.split(',').forEach(function(t){ towns[t.trim()]=1; }); });
-  var areaSel=document.getElementById('area');
-  areaSel.innerHTML='<option value="">All areas</option>'+Object.keys(towns).sort().map(function(t){return '<option>'+esc(t)+'</option>';}).join('');
-
-  // Warning banner
-  (function(){
-    var w=creeks.filter(function(c){return c.dash==='warning';}).map(function(c){return c.name+' ('+c.place+')';});
-    if (!w.length) return;
-    var a=document.getElementById('alert');
-    a.innerHTML='<b>Flooding is likely at '+esc(list(w))+'.</b> If you are in danger, call 911. <a href="'+GENASYS+'">Check your evacuation zone</a>.';
-    a.hidden=false;
-  })();
-
-  // At a glance — plain sentences, no color chips
-  (function(){
-    var warn=creeks.filter(function(c){return c.dash==='warning';}).map(function(c){return c.name;});
-    var watch=creeks.filter(function(c){return c.dash==='watch';}).map(function(c){return c.name;});
-    var sev=creeks.filter(function(c){return !c.dash && rainLevel(c)==='severe';}).map(function(c){return c.name;});
-    var vh=creeks.filter(function(c){return !c.dash && rainLevel(c)==='vheavy';}).length;
-    var fast=creeks.filter(function(c){return !c.dash && isFast(c);}).map(function(c){return c.name;});
-    var stale=creeks.filter(function(c){return c.stale;}).map(function(c){return c.name;});
-    var coastQuiet=creeks.filter(function(c){return c.region==='coast';}).every(function(c){return !c.dash && (rainLevel(c)==='none'||rainLevel(c)==='stale');});
-    var s=[];
-    if (warn.length) s.push('<b>'+esc(list(warn))+(warn.length>1?' are':' is')+' at Warning.</b>');
-    if (watch.length) s.push('<b>'+esc(list(watch))+(watch.length>1?' are':' is')+' at Watch.</b>');
-    if (fast.length) s.push('<b>'+esc(list(fast))+(fast.length>1?' are':' is')+' rising fast.</b>');
-    if (sev.length) s.push('Severe rain above '+esc(list(sev))+'.');
-    if (vh) s.push('Very heavy rain above '+vh+' more creek'+(vh>1?'s':'')+'.');
-    s.push('The Bay tide is '+TIDE.dir+' ('+TIDE.next+').');
-    if (coastQuiet) s.push('No rain alerts on the Coastside.');
-    if (stale.length) s.push('No recent data for '+esc(list(stale))+'.');
-    document.getElementById('summary').innerHTML=s.join(' ');
-  })();
-
-  function tideRow(c){
-    if (!c.tidal) return '';
-    var arrow = TIDE.dir==='rising' ? '↑' : '↓';
-    return '<div class="r"><span class="lbl">Bay tide</span><span class="val"><span aria-hidden="true">'+arrow+'</span>'+(TIDE.dir==='rising'?'Rising':'Falling')+'</span></div>';
-  }
+  // ---------- Card ----------
   function card(c){
-    var k=rainLevel(c), r=R[k];
-    var cls='card'+(c.dash==='watch'?' watch':c.dash==='warning'?' warning':(!c.dash && (k==='severe'||isFast(c)))?' severe':'');
-    var h='<div class="head"><h3>'+esc(c.name)+'</h3><div class="place">'+esc(c.place)+'</div></div>'+(c.dash?band(c):'')+'<div class="rows">';
-    if (!c.dash) {
-      h+='<div class="r"><span class="lbl">Creek level</span><span class="val">'+trendTxt(c)+'</span></div>';
-    }
-    if (k==='stale') h+='<div class="r"><span class="lbl">Rain upstream</span><span class="val">No recent data</span></div>';
-    else if (k!=='none') h+='<div class="r"><span class="lbl">Rain upstream</span><span class="val">'+rchip(k)+'</span></div>';
-    else if (!c.dash) h+='<div class="r"><span class="lbl">Rain upstream</span><span class="val" style="font-weight:500">No alerts</span></div>';
-    h+=tideRow(c)+'</div>';
-
-    // One plain sentence, then what to do.
-    var say='', todo='';
-    if (c.dash && c.dash!=='normal') { todo=O[c.dash].todo; }
-    else if (c.dash==='normal' && isHeavy(c)) { say='Heavy rain upstream may make this creek rise.'; todo='Stay away from the creek banks and check back often.'; }
-    else if (c.dash==='normal') { todo=O.normal.todo; }
-    else if (k==='stale') { say='The rain gauge for this creek hasn’t reported since '+c.stale+'. Conditions may have changed.'; todo=r.todo; }
-    else if (k!=='none') { say='Rain over the '+durWords(c)+' in the hills above is '+(k==='severe'?'rare for this area':k==='vheavy'?'the kind this area sees only every few years':'heavier than a typical storm here')+'.'+(c.extra?' '+c.extra:''); todo=r.todo; }
-    else { todo=r.todo; }
-    if (!c.dash && isFast(c)) { say='The creek is rising quickly.'+(say?' '+say:''); if (k!=='severe') todo=R.severe.todo; }
-    if (c.tidal && TIDE.dir==='rising' && (isHeavy(c) || (c.dash && c.dash!=='normal'))) say+=(say?' ':'')+'The rising tide slows drainage near the Bay.';
-
-    h+='<div class="body">'+(c.dash==='warning'?'<p class="danger">If you are in danger, call 911.</p>':'')+(say?'<p>'+esc(say)+'</p>':'')+'<p class="todo"><b>What to do:</b> '+esc(todo)+'</p></div>';
-    if (c.dash==='warning' || c.dash==='watch' || (!c.dash && (k==='severe'||isFast(c)))) h+='<a class="act" href="'+GENASYS+'">Check your evacuation zone <span aria-hidden="true">→</span></a>';
-    h+='<div class="foot"><span>'+(k==='stale' ? 'Last report '+esc(c.stale) : 'As of '+NOW)+(c.dash ? '' : ' · No flood level set for this creek yet')+(c.limited?' · Rain gauges may miss storms here':'')+'</span>'+
-       '<a href="#" aria-label="See the creek level chart for '+esc(c.name)+'">Creek level chart <span aria-hidden="true">→</span></a></div>';
-    return '<article class="'+cls+'">'+h+'</article>';
+    var v=verdict(c), k=rainLevel(c), w=why(c), t=tideNote(c);
+    var h='<div class="head"><h3>'+esc(c.name)+'</h3><div class="place">'+esc(c.place)+'</div></div>'+
+      '<div class="verdict '+v+'"><span class="ic" aria-hidden="true"></span>'+V[v].label+'</div>'+
+      (w?'<p class="why">'+esc(w)+'</p>':'')+(t?'<p class="why">'+esc(t)+'</p>':'')+
+      '<div class="body">'+(v==='likely'?'<p class="danger">If you are in danger, call 911.</p>':'')+
+      '<p class="todo"><b>What to do:</b> '+esc(V[v].todo)+'</p></div>';
+    if (v==='likely'||v==='ready') h+='<a class="act" href="'+GENASYS+'">See if your area has an evacuation order <span aria-hidden="true">→</span></a>';
+    h+='<div class="details"><div class="dh">Details</div>'+
+      (c.dash ? band(c) : '<div class="r"><span class="lbl">Creek level</span><span class="val">'+trendTxt(c)+'</span></div>')+
+      '<div class="r"><span class="lbl">Rain in the hills above</span><span class="val">'+(k==='none'?'<span style="font-weight:500">Normal</span>':k==='stale'?'No recent data':rchip(k))+'</span></div>'+
+      '</div>';
+    h+='<div class="foot"><span>'+(k==='stale'?'Rain data last reported '+esc(c.stale):'As of '+NOW)+(c.dash?'':' · No flood level set for this creek yet')+(c.limited?' · Rain gauges may miss storms here':'')+'</span>'+
+      '<a href="#" aria-label="See how high '+esc(c.name)+' is">See how high the creek is <span aria-hidden="true">→</span></a></div>';
+    return '<article class="card '+v+'">'+h+'</article>';
   }
+
+  // ---------- Staff row ----------
   function row(c){
-    var k=rainLevel(c), r=R[k], heavy=c.driver ? c.driver.split(' at ') : null;
+    var v=verdict(c), k=rainLevel(c), heavy=c.driver ? c.driver.split(' at ') : null;
     return '<tr><td class="cn"><b>'+esc(c.name)+'</b><span>'+esc(c.place)+'</span></td>'+
-      '<td>'+(c.dash ? (c.dash==='normal'?'Normal':'<span class="tag '+c.dash+'">'+O[c.dash].name+'</span>') : '<span class="dim">No threshold</span>')+
-        '<span class="sm">'+trendTxt(c)+' · '+esc(c.rate)+' ft/hr</span></td>'+
+      '<td><span class="vtag"><i style="background:'+V[v].color+'"></i>'+V[v].label+'</span></td>'+
+      '<td>'+(c.dash ? (c.dash==='normal'?'Normal':'<span class="tag '+c.dash+'">'+O[c.dash]+'</span>') : '<span class="dim">No threshold</span>')+
+        '<span class="sm">'+TR[c.trend].w+' · '+esc(c.rate)+' ft/hr</span></td>'+
       '<td>'+(k==='none'?'<span class="dim">Normal</span>':k==='stale'?'<span class="gap">No recent data</span>':rchip(k))+'</td>'+
       '<td><b style="font-size:16px">'+(k==='none'||k==='stale'?'—':esc(c.aep))+'</b></td>'+
       '<td>'+(heavy ? esc(heavy[0])+'<span class="sm">at '+esc(heavy[1])+'</span>' : '<span class="dim">Nothing above normal</span>')+'</td>'+
       '<td><b style="font-size:16px">'+c.up+'</b> <span class="dim">of '+c.of+'</span></td>'+
       '<td>'+(c.tidal ? esc(TIDE.staff) : '<span class="dim">Not tidal</span>')+'</td>'+
-      '<td>'+(c.stale ? '<span class="gap">Last report '+esc(c.stale)+'</span>' : '<span class="dim">'+NOW+'</span>')+'</td>'+
+      '<td>'+(c.stale ? '<span class="gap">Rain last report '+esc(c.stale)+'</span>' : '<span class="dim">'+NOW+'</span>')+'</td>'+
       '<td>'+(c.note ? '<span class="gap">'+esc(c.note)+'</span>' : '')+'</td></tr>';
   }
 
-  var sortMode='risk';
-  function visible(){
-    var area=areaSel.value, a=creeks.filter(function(c){ return !area || c.place.split(',').map(function(t){return t.trim();}).indexOf(area)>=0; });
+  // ---------- Banner + summary (follow the selected area) ----------
+  function topOfPage(area){
+    var set=creeks.filter(function(c){return inArea(c,area);});
+    var by=function(v){ return set.filter(function(c){return verdict(c)===v;}).map(function(c){return c.name;}); };
+    var likely=by('likely'), ready=by('ready'), alert=by('alert'), nod=by('nodata');
+    var a=document.getElementById('alert');
+    if (likely.length){ a.innerHTML='<b>Flooding is likely at '+esc(list(likely))+'.</b> If you are in danger, call 911. <a href="'+GENASYS+'">See if your area has an evacuation order</a>.'; a.hidden=false; }
+    else a.hidden=true;
+
+    var pre = area ? esc(area)+': ' : '', m=[];
+    if (likely.length) m.push('Flooding likely at '+esc(list(likely))+'.');
+    if (ready.length) m.push('Be ready near '+esc(list(ready))+'.');
+    if (alert.length) m.push(alert.length<=3 ? 'Stay alert near '+esc(list(alert))+'.' : 'Stay alert near '+alert.length+' other creeks.');
+    if (!m.length) m.push(area ? 'No creek alerts near '+esc(area)+' right now.' : 'No creek alerts right now.');
+    document.getElementById('summary').innerHTML=pre+m.join(' ');
+
+    var s=[];
+    if (set.some(function(c){return c.tidal && V[verdict(c)].rank>=2;}) && tideRising) s.push('Bay tide rising until about '+TIDE.until+' — water near the Bay drains slowly.');
+    if (!area){ var coast=creeks.filter(function(c){return c.region==='coast';}); if (coast.every(function(c){return V[verdict(c)].rank<=1;})) s.push('Coastside: no alerts.'); }
+    if (nod.length) s.push('No recent rain data for '+esc(list(nod))+'.');
+    s.push('Conditions can change quickly. This page updates every 15 minutes.');
+    document.getElementById('summary-sub').innerHTML=s.join(' ');
+  }
+
+  // ---------- Render ----------
+  var areaSel=document.getElementById('area'), sortMode='risk';
+  var towns={}; creeks.forEach(function(c){ c.place.split(',').forEach(function(t){ towns[t.trim()]=1; }); });
+  areaSel.innerHTML='<option value="">All of San Mateo County</option>'+Object.keys(towns).sort().map(function(t){return '<option>'+esc(t)+'</option>';}).join('');
+  document.getElementById('genasys-foot').href=GENASYS;
+
+  function render(){
+    var area=areaSel.value;
+    var a=creeks.filter(function(c){return inArea(c,area);});
     if (sortMode==='az') a.sort(function(x,y){return x.name.localeCompare(y.name);});
     else a.sort(function(x,y){return score(y)-score(x) || x.name.localeCompare(y.name);});
-    return a;
-  }
-  function render(){
-    var a=visible(), area=areaSel.value, f=document.getElementById('filtered');
-    document.getElementById('pub-cards').innerHTML = a.length ? a.map(card).join('') : '<div class="empty">No monitored creeks listed for this area.</div>';
+    var active=a, quiet=[];
+    if (sortMode==='risk'){ active=a.filter(function(c){return verdict(c)!=='none';}); quiet=a.filter(function(c){return verdict(c)==='none';}); }
+    document.getElementById('pub-cards').innerHTML = active.length ? active.map(card).join('') : '';
+    var q=document.getElementById('quiet');
+    q.hidden=!quiet.length;
+    if (quiet.length){
+      document.getElementById('quiet-sum').textContent=quiet.length+' creek'+(quiet.length>1?'s':'')+' with no alerts — '+list(quiet.map(function(c){return short(c.name);}))+' (show)';
+      document.getElementById('quiet-cards').innerHTML=quiet.map(card).join('');
+      if (!active.length) q.open=true;
+    }
     document.getElementById('staff-rows').innerHTML=a.map(row).join('');
-    f.hidden=!area; if (area) f.innerHTML='Showing '+a.length+' creek'+(a.length>1?'s':'')+' in '+esc(area)+'. <a href="#" id="clear-area">Show all areas</a>';
-    var ca=document.getElementById('clear-area'); if (ca) ca.addEventListener('click', function(e){ e.preventDefault(); areaSel.value=''; render(); });
+    topOfPage(area);
   }
-  areaSel.addEventListener('change', render);
+  areaSel.addEventListener('change', function(){ document.getElementById('loc-msg').hidden=true; render(); });
   var sRisk=document.getElementById('s-risk'), sAz=document.getElementById('s-az');
   function setSort(m){ sortMode=m; sRisk.setAttribute('aria-pressed', m==='risk'); sAz.setAttribute('aria-pressed', m==='az'); render(); }
   sRisk.addEventListener('click', function(){ setSort('risk'); });
   sAz.addEventListener('click', function(){ setSort('az'); });
 
+  // Use my location → nearest town (mockup: approximate town centers)
+  document.getElementById('locate').addEventListener('click', function(){
+    var msg=document.getElementById('loc-msg');
+    function say(t){ msg.textContent=t; msg.hidden=false; }
+    if (!navigator.geolocation){ say('Location isn’t available in this browser. Choose your area from the list.'); return; }
+    navigator.geolocation.getCurrentPosition(function(p){
+      var best=null, bd=1e9, la=p.coords.latitude, lo=p.coords.longitude;
+      for (var t in TOWNS){ var d=Math.pow(TOWNS[t][0]-la,2)+Math.pow((TOWNS[t][1]-lo)*0.79,2); if (d<bd){bd=d;best=t;} }
+      if (bd>0.04){ say('You seem to be outside the area this page covers. Choose an area from the list.'); return; }
+      areaSel.value=best; render(); say('Showing creeks near '+best+'.');
+    }, function(){ say('We couldn’t get your location. Choose your area from the list.'); }, {timeout:8000});
+  });
+
+  // Staff view only via #staff
   function applyView(){
-    var staff = location.hash==='#staff';
+    var staff=location.hash==='#staff';
     document.getElementById('v-pub').hidden=staff;
     document.getElementById('v-staff').hidden=!staff;
     document.getElementById('staffbadge').hidden=!staff;
   }
   document.getElementById('to-public').addEventListener('click', function(e){ e.preventDefault(); try{ history.replaceState(null,'',location.pathname); }catch(x){} applyView(); });
   window.addEventListener('hashchange', applyView);
+
+  // Live version: refresh every 15 minutes, keeping the chosen view.
+  setTimeout(function(){ location.reload(); }, 15*60*1000);
 
   render();
   applyView();
