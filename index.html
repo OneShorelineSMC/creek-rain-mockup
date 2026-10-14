@@ -42,7 +42,11 @@
   .glance .sub{margin:8px 0 0;font-size:15px;line-height:1.5;color:var(--soft)}
   .glance .loc{font-size:14px;color:var(--muted);margin-top:8px}
   details.more{margin-top:10px}
-  details.more summary,.quiet summary{cursor:pointer;font-size:15px;font-weight:600;color:var(--link);min-height:44px;display:flex;align-items:center}
+  details.more summary,.quiet summary{cursor:pointer;font-size:15px;font-weight:600;color:var(--link);min-height:44px;display:flex;align-items:center;gap:8px;list-style:none}
+  details.more summary::-webkit-details-marker,.quiet summary::-webkit-details-marker{display:none}
+  details.more summary::before,.quiet summary::before{content:"";width:8px;height:8px;border-right:2.5px solid currentColor;border-bottom:2.5px solid currentColor;transform:rotate(-45deg);transition:transform .15s;flex-shrink:0;margin-right:2px}
+  details[open].more summary::before,details[open].quiet summary::before{transform:rotate(45deg)}
+  details.more summary .hint,.quiet summary .hint{font-weight:500;color:var(--muted);font-size:14px}
   .explain{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-top:4px}
   .explain div{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;font-size:15px;line-height:1.5;color:var(--soft)}
   .explain h3{margin:0 0 6px;font-size:16px;color:var(--ink)}
@@ -51,6 +55,7 @@
   .vlist li{display:flex;gap:8px;align-items:flex-start;margin-bottom:6px}
 
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;padding:16px 0 8px}
+  @supports (grid-template-rows:subgrid){ .grid .card{display:grid;grid-row:span 3;grid-template-rows:subgrid;row-gap:0} }
   .quiet{margin:8px 0 24px}
   .quiet summary{font-size:16px}
   .card{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
@@ -73,8 +78,10 @@
   .body p{margin:0;font-size:16px;line-height:1.5}
   .todo b{color:var(--ink)}
   .danger{font-weight:700;color:#8E2219}
+  .evac{display:inline-flex;align-items:center;gap:10px;margin-top:12px;min-height:48px;padding:10px 16px;border-radius:8px;background:var(--link);color:#FFFFFF;text-decoration:none;font-size:16px;font-weight:700}
+  .evac:hover{background:#163A5A;color:#FFFFFF}
   .act{margin:0 16px 12px;display:flex;align-items:center;justify-content:space-between;min-height:44px;padding:8px 12px;border:2px solid var(--link);border-radius:8px;text-decoration:none;font-size:15px;font-weight:700;color:var(--link)}
-  .details{margin:0 16px 12px;border-top:1px solid #ECEFF3}
+  .details{margin:0 16px 12px;border-top:1px solid #ECEFF3;align-self:start}
   .details .dh{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding:10px 0 2px}
   .r{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid #ECEFF3;font-size:15px}
   .r:last-child{border-bottom:0}
@@ -153,11 +160,12 @@
   <section class="glance" aria-label="At a glance" aria-live="polite">
     <p class="main" id="summary"></p>
     <p class="sub" id="summary-sub"></p>
+    <a class="evac" id="evac" href="#" hidden>See if your area has an evacuation order <span aria-hidden="true">→</span></a>
     <div class="loc" id="loc-msg" hidden></div>
   </section>
 
   <details class="more">
-    <summary>How to read this page</summary>
+    <summary>How to read this page <span class="hint">(tap to open)</span></summary>
     <div class="explain">
       <div><h3>The status at the top of each card</h3>
         <ul class="vlist">
@@ -198,7 +206,7 @@
 
 <script>
 (function () {
-  var NOW = '10:15 AM';
+  var NOW = '10:15 AM', TODAY = 'Wed, Oct 14';
   var GENASYS = 'https://protect.genasys.com/';
 
   // ---------- Inputs ----------
@@ -306,17 +314,16 @@
   // ---------- Card ----------
   function card(c){
     var v=verdict(c), k=rainLevel(c), w=why(c), t=tideNote(c);
-    var h='<div class="head"><h3>'+esc(c.name)+'</h3><div class="place">'+esc(c.place)+'</div></div>'+
+    var h='<div class="top"><div class="head"><h3>'+esc(c.name)+'</h3><div class="place">'+esc(c.place)+'</div></div>'+
       '<div class="verdict '+v+'"><span class="ic" aria-hidden="true"></span>'+V[v].label+'</div>'+
       (w?'<p class="why">'+esc(w)+'</p>':'')+(t?'<p class="why">'+esc(t)+'</p>':'')+
       '<div class="body">'+(v==='likely'?'<p class="danger">If you are in danger, call 911.</p>':'')+
-      '<p class="todo"><b>What to do:</b> '+esc(V[v].todo)+'</p></div>';
-    if (v==='likely'||v==='ready') h+='<a class="act" href="'+GENASYS+'">See if your area has an evacuation order <span aria-hidden="true">→</span></a>';
+      '<p class="todo"><b>What to do:</b> '+esc(V[v].todo)+'</p></div></div>';
     h+='<div class="details"><div class="dh">Details</div>'+
       (c.dash ? band(c) : '<div class="r"><span class="lbl">Creek level</span><span class="val">'+trendTxt(c)+'</span></div>')+
       '<div class="r"><span class="lbl">Rain in the hills above</span><span class="val">'+(k==='none'?'<span style="font-weight:500">Normal</span>':k==='stale'?'No recent data':rchip(k))+'</span></div>'+
       '</div>';
-    h+='<div class="foot"><span>'+(k==='stale'?'Rain data last reported '+esc(c.stale):'As of '+NOW)+(c.dash?'':' · No flood level set for this creek yet')+(c.limited?' · Rain gauges may miss storms here':'')+'</span>'+
+    h+='<div class="foot"><span>'+(k==='stale'?'Rain data last reported '+TODAY+', '+esc(c.stale):'As of '+TODAY+', '+NOW)+(c.dash?'':' · No flood level set for this creek yet')+(c.limited?' · Rain gauges may miss storms here':'')+'</span>'+
       '<a href="#" aria-label="See how high '+esc(c.name)+' is">See how high the creek is <span aria-hidden="true">→</span></a></div>';
     return '<article class="card '+v+'">'+h+'</article>';
   }
@@ -333,7 +340,7 @@
       '<td>'+(heavy ? esc(heavy[0])+'<span class="sm">at '+esc(heavy[1])+'</span>' : '<span class="dim">Nothing above normal</span>')+'</td>'+
       '<td><b style="font-size:16px">'+c.up+'</b> <span class="dim">of '+c.of+'</span></td>'+
       '<td>'+(c.tidal ? esc(TIDE.staff) : '<span class="dim">Not tidal</span>')+'</td>'+
-      '<td>'+(c.stale ? '<span class="gap">Rain last report '+esc(c.stale)+'</span>' : '<span class="dim">'+NOW+'</span>')+'</td>'+
+      '<td>'+(c.stale ? '<span class="gap">Rain last report '+TODAY+', '+esc(c.stale)+'</span>' : '<span class="dim">'+TODAY+', '+NOW+'</span>')+'</td>'+
       '<td>'+(c.note ? '<span class="gap">'+esc(c.note)+'</span>' : '')+'</td></tr>';
   }
 
@@ -342,6 +349,7 @@
     var set=creeks.filter(function(c){return inArea(c,area);});
     var by=function(v){ return set.filter(function(c){return verdict(c)===v;}).map(function(c){return c.name;}); };
     var likely=by('likely'), ready=by('ready'), alert=by('alert'), nod=by('nodata');
+    var ev=document.getElementById('evac'); ev.href=GENASYS; ev.hidden=!(likely.length||ready.length);
     var a=document.getElementById('alert');
     if (likely.length){ a.innerHTML='<b>Flooding is likely at '+esc(list(likely))+'.</b> If you are in danger, call 911. <a href="'+GENASYS+'">See if your area has an evacuation order</a>.'; a.hidden=false; }
     else a.hidden=true;
@@ -378,7 +386,7 @@
     var q=document.getElementById('quiet');
     q.hidden=!quiet.length;
     if (quiet.length){
-      document.getElementById('quiet-sum').textContent=quiet.length+' creek'+(quiet.length>1?'s':'')+' with no alerts — '+list(quiet.map(function(c){return short(c.name);}))+' (show)';
+      document.getElementById('quiet-sum').innerHTML=quiet.length+' creek'+(quiet.length>1?'s':'')+' with no alerts — '+esc(list(quiet.map(function(c){return short(c.name);})))+' <span class="hint">(tap to show)</span>';
       document.getElementById('quiet-cards').innerHTML=quiet.map(card).join('');
       if (!active.length) q.open=true;
     }
