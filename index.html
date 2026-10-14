@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root{--ink:#16202B;--muted:#556274;--soft:#3A4756;--line:#D5DAE1;--bg:#F4F5F7;--card:#FFFFFF;--panel:#F6F7F9;--rain:#2F5FB3;--link:#1F4E79;--watch:#F08A24;--warn:#C8352B}
+  :root{--ink:#16202B;--muted:#556274;--soft:#3A4756;--line:#D5DAE1;--bg:#F4F5F7;--card:#FFFFFF;--panel:#F6F7F9;--rain:#2F5FB3;--link:#1F4E79;--watch:#DB6A0C;--warn:#B50909}
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
   a{color:var(--link)}a:hover{color:#163A5A}
@@ -60,7 +60,13 @@
   .meter{display:inline-flex;gap:3px;align-items:flex-end}
   .meter i{display:block;width:6px;border-radius:2px;background:#D5DAE1}
   .meter i:nth-child(1){height:8px}.meter i:nth-child(2){height:12px}.meter i:nth-child(3){height:16px}
-  .meter i.on{background:var(--rain)}
+  .meter i.on{background:currentColor}
+  .meter i:not(.on){background:rgba(0,0,0,.18)}
+  .rchip{display:inline-flex;align-items:center;gap:8px;border-radius:6px;padding:3px 10px;font-weight:700}
+  .rchip.heavy{background:#FFBE2E;color:var(--ink)}
+  .rchip.vheavy{background:var(--watch);color:var(--ink)}
+  .rchip.severe{background:var(--warn);color:#FFFFFF}
+  .rchip.severe .meter i:not(.on){background:rgba(255,255,255,.35)}
   .body{padding:12px 16px 14px;display:flex;flex-direction:column;gap:8px}
   .body p{margin:0;font-size:15px;line-height:1.5}
   .todo{color:var(--soft)}.todo b{color:var(--ink)}
@@ -117,8 +123,8 @@
   <details class="more">
     <summary>How to read this page</summary>
     <div class="explain">
-      <div><h3>Creek level</h3><p>Measured in the creek on creeks that have a gauge. <b>Watch</b> (orange frame): the creek is rising toward flooding. <b>Warning</b> (red frame): flooding is likely or happening.</p><p>These are separate from National Weather Service alerts. Follow whichever is more serious.</p></div>
-      <div><h3>Rain upstream</h3><p>How unusual the rain is in the hills above the creek. More bars means heavier rain: <b>Heavy</b>, <b>Very heavy</b>, <b>Severe</b>. Cards with severe rain have a bold black frame.</p><p>Rain is not the same as flooding, but heavy rain can make creeks rise quickly.</p></div>
+      <div><h3>Creek level</h3><p>Measured in the creek. Every card shows whether the water is <b>rising fast</b>, <b>rising</b>, <b>steady</b> or <b>falling</b>.</p><p>Some creeks also have flood levels set: <b>Watch</b> (orange frame) means the creek is rising toward flooding; <b>Warning</b> (red frame) means flooding is likely or happening. On creeks without flood levels yet, a creek rising fast gets a bold black frame.</p><p>These are separate from National Weather Service alerts. Follow whichever is more serious.</p></div>
+      <div><h3>Rain upstream</h3><p>How unusual the rain is in the hills above the creek. More bars means heavier rain: <b>Heavy</b> (yellow), <b>Very heavy</b> (orange), <b>Severe</b> (red). Rain colors describe the rain only — a card's frame shows its overall status. Creeks without flood levels get a bold black frame when rain is severe.</p><p>Rain is not the same as flooding, but heavy rain can make creeks rise quickly.</p></div>
       <div><h3>Tide</h3><p>For creeks near the Bay. When the tide is <b>rising</b>, water drains more slowly and low areas can flood more easily.</p></div>
     </div>
   </details>
@@ -128,7 +134,7 @@
   </section>
 
   <section id="v-staff" hidden>
-    <p class="staffnote">Staff view — not linked from the public page. <a href="#" id="to-public">Open public view</a>. Official creek level comes from the creek dashboards and always takes priority. <b>Chance in any year</b> = annual exceedance probability (AEP) of the heaviest rain at any of the creek's gauges. Severe rain needs two gauges agreeing.</p>
+    <p class="staffnote">Staff view — not linked from the public page. <a href="#" id="to-public">Open public view</a>. Official creek level comes from the creek dashboards and always takes priority. Every creek shows its stage trend and rate (ft/hr, sample values); "Rising fast" uses an interim rate-of-rise threshold to be set per gauge. <b>Chance in any year</b> = annual exceedance probability (AEP) of the heaviest rain at any of the creek's gauges. Severe rain needs two gauges agreeing.</p>
     <div class="tbl-wrap">
       <table class="tbl">
         <thead><tr><th scope="col">Creek</th><th scope="col">Creek level</th><th scope="col">Rain upstream</th><th scope="col">Chance in any year</th><th scope="col">Heaviest rain</th><th scope="col">Gauges elevated</th><th scope="col">Tide</th><th scope="col">Data</th><th scope="col">Notes</th></tr></thead>
@@ -168,44 +174,50 @@
   // Sample storm — illustrative. Rain levels computed against each gauge's Atlas 14 table;
   // official creek levels and the offline gauge are made up to show each state.
   var creeks = [
-    {name:'San Bruno Creek',place:'San Bruno',region:'bay',tidal:1,dash:'warning',rain:'orange',aep:'28%',
+    {name:'San Bruno Creek',trend:'rising',rate:'+0.6',place:'San Bruno',region:'bay',tidal:1,dash:'warning',rain:'orange',aep:'28%',
      driver:'3 hr: 1.07 in at San Bruno Creek gauge',up:2,of:2,note:'Creek at Warning with rain only very heavy — likely tide'},
-    {name:'Belmont Creek',place:'Belmont, San Carlos',region:'bay',dash:'watch',rain:'purple',aep:'9%',
+    {name:'Belmont Creek',trend:'fast',rate:'+1.1',place:'Belmont, San Carlos',region:'bay',dash:'watch',rain:'purple',aep:'9%',
      driver:'1 hr: 0.75 in at Belmont Creek gauge',up:3,of:3,note:'Confirm Pulgas gauge is in this watershed'},
-    {name:'Atherton Channel',place:'Atherton, Redwood City, Menlo Park',region:'bay',dash:'normal',rain:'red',aep:'15%',
+    {name:'Atherton Channel',trend:'rising',rate:'+0.3',place:'Atherton, Redwood City, Menlo Park',region:'bay',dash:'normal',rain:'red',aep:'15%',
      driver:'3 hr: 1.94 in at Huddart Park',up:4,of:4,note:'Creek still normal — rain gives lead time'},
-    {name:'Colma Creek',place:'South San Francisco, Colma',region:'bay',tidal:1,dash:'normal',rain:'orange',aep:'33%',
+    {name:'Colma Creek',trend:'steady',rate:'+0.1',place:'South San Francisco, Colma',region:'bay',tidal:1,dash:'normal',rain:'orange',aep:'33%',
      driver:'6 hr: 1.60 in at San Bruno Mountain',up:2,of:2},
-    {name:'Redwood Creek',place:'Redwood City',region:'bay',tidal:1,rain:'red',aep:'15%',
+    {name:'Redwood Creek',trend:'fast',rate:'+0.9',place:'Redwood City',region:'bay',tidal:1,rain:'red',aep:'15%',
      driver:'3 hr: 1.94 in at Huddart Park',up:3,of:3},
-    {name:'Bear Creek',place:'Woodside, Portola Valley',region:'bay',rain:'red',aep:'15%',
+    {name:'Bear Creek',trend:'rising',rate:'+0.4',place:'Woodside, Portola Valley',region:'bay',rain:'red',aep:'15%',
      driver:'3 hr: 1.94 in at Huddart Park',up:2,of:2},
-    {name:'San Francisquito Creek',place:'Menlo Park, Palo Alto, East Palo Alto',region:'bay',tidal:1,rain:'orange',aep:'19%',
+    {name:'San Francisquito Creek',trend:'rising',rate:'+0.5',place:'Menlo Park, Palo Alto, East Palo Alto',region:'bay',tidal:1,rain:'orange',aep:'19%',
      driver:'3 hr: 2.14 in at Wunderlich County Park',up:3,of:3,note:'SFC and 11164500 are the same site — pick one'},
-    {name:'Los Trancos Creek',place:'Portola Valley, Palo Alto',region:'bay',rain:'orange',aep:'39%',
+    {name:'Los Trancos Creek',trend:'rising',rate:'+0.3',place:'Portola Valley, Palo Alto',region:'bay',rain:'orange',aep:'39%',
      driver:'3 hr: 1.62 in at Windy Hill',up:3,of:3},
-    {name:'San Mateo Creek',place:'San Mateo, Hillsborough',region:'bay',tidal:1,rain:'orange',aep:'39%',
+    {name:'San Mateo Creek',trend:'steady',rate:'0.0',place:'San Mateo, Hillsborough',region:'bay',tidal:1,rain:'orange',aep:'39%',
      driver:'6 hr: 1.59 in at Crystal Springs Cottage',up:1,of:2,extra:'Crystal Springs Reservoir holds back much of this water.',
      note:'Reservoir controls most flow — add USGS 11162750 level vs. 294.6 ft spill'},
-    {name:'Green Hills Creek',place:'Millbrae',region:'bay',tidal:1,rain:'none',up:0,of:1,limited:true,note:'Data gap: no rain gauge upslope; drains to Highline Canal'},
-    {name:'Pilarcitos Creek',place:'Half Moon Bay',region:'coast',rain:'none',up:0,of:1,limited:true,note:'Data gap: no gauge in the lower watershed'},
-    {name:'San Gregorio Creek',place:'San Gregorio, La Honda',region:'coast',rain:'none',stale:'8:40 AM',up:0,of:1,note:'SAMPLE: La Honda gauge offline since 8:40 AM'},
-    {name:'Pescadero Creek',place:'Pescadero',region:'coast',rain:'none',up:0,of:4,limited:true,note:'Data gap: hillside rain gauges are 5–8 miles away'},
-    {name:'Butano Creek',place:'Pescadero',region:'coast',rain:'none',up:0,of:3,limited:true,note:'Data gap: no rain gauge in the upper watershed'}
+    {name:'Green Hills Creek',trend:'steady',rate:'0.0',place:'Millbrae',region:'bay',tidal:1,rain:'none',up:0,of:1,limited:true,note:'Data gap: no rain gauge upslope; drains to Highline Canal'},
+    {name:'Pilarcitos Creek',trend:'steady',rate:'0.0',place:'Half Moon Bay',region:'coast',rain:'none',up:0,of:1,limited:true,note:'Data gap: no gauge in the lower watershed'},
+    {name:'San Gregorio Creek',trend:'steady',rate:'+0.1',place:'San Gregorio, La Honda',region:'coast',rain:'none',stale:'8:40 AM',up:0,of:1,note:'SAMPLE: La Honda gauge offline since 8:40 AM'},
+    {name:'Pescadero Creek',trend:'falling',rate:'-0.1',place:'Pescadero',region:'coast',rain:'none',up:0,of:4,limited:true,note:'Data gap: hillside rain gauges are 5–8 miles away'},
+    {name:'Butano Creek',trend:'steady',rate:'0.0',place:'Pescadero',region:'coast',rain:'none',up:0,of:3,limited:true,note:'Data gap: no rain gauge in the upper watershed'}
   ];
 
   function esc(s){ return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
   function list(a){ return a.length<2 ? a.join('') : a.slice(0,-1).join(', ')+' and '+a[a.length-1]; }
   function meter(n){ var s='<span class="meter" aria-hidden="true">'; for (var i=1;i<=3;i++) s+='<i'+(i<=n?' class="on"':'')+'></i>'; return s+'</span>'; }
+  function rchip(k){ return '<span class="rchip '+k+'">'+meter(R[k].bars)+R[k].name+'</span>'; }
   function durWords(c){ var m=c.driver && c.driver.match(/^(\d+) hr/); if(!m) return 'past few hours'; return m[1]==='1' ? 'past hour' : 'past '+m[1]+' hours'; }
   function isHeavy(c){ var k=rainLevel(c); return k==='vheavy'||k==='severe'; }
+  // Creek-level trend from the stream gauge (rate of rise). "Rising fast" = interim rate-of-rise threshold, to be set per gauge.
+  var TR = {fast:{a:'↑↑',w:'Rising fast'}, rising:{a:'↑',w:'Rising'}, steady:{a:'→',w:'Steady'}, falling:{a:'↓',w:'Falling'}};
+  function trendTxt(c){ var t=TR[c.trend]; return '<span aria-hidden="true">'+t.a+'</span> '+t.w; }
+  function isFast(c){ return c.trend==='fast'; }
 
   // Urgency: Warning > Watch > rain level; rising tide nudges heavy rain up; offline above quiet.
   var RS={none:0,stale:10,heavy:30,vheavy:50,severe:70};
   function score(c){
     if (c.dash==='warning') return 100;
     if (c.dash==='watch') return 90;
-    var s=RS[rainLevel(c)] + (c.tidal && TIDE.dir==='rising' && isHeavy(c) ? 5 : 0);
+    var s=RS[rainLevel(c)] + (c.tidal && TIDE.dir==='rising' && isHeavy(c) ? 5 : 0)
+         + (isFast(c) ? 15 : c.trend==='rising' ? 3 : 0);
     return c.dash==='normal' ? s-1 : s;
   }
 
@@ -232,11 +244,13 @@
     var watch=creeks.filter(function(c){return c.dash==='watch';}).map(function(c){return c.name;});
     var sev=creeks.filter(function(c){return !c.dash && rainLevel(c)==='severe';}).map(function(c){return c.name;});
     var vh=creeks.filter(function(c){return !c.dash && rainLevel(c)==='vheavy';}).length;
+    var fast=creeks.filter(function(c){return !c.dash && isFast(c);}).map(function(c){return c.name;});
     var stale=creeks.filter(function(c){return c.stale;}).map(function(c){return c.name;});
     var coastQuiet=creeks.filter(function(c){return c.region==='coast';}).every(function(c){return !c.dash && (rainLevel(c)==='none'||rainLevel(c)==='stale');});
     var s=[];
     if (warn.length) s.push('<b>'+esc(list(warn))+(warn.length>1?' are':' is')+' at Warning.</b>');
     if (watch.length) s.push('<b>'+esc(list(watch))+(watch.length>1?' are':' is')+' at Watch.</b>');
+    if (fast.length) s.push('<b>'+esc(list(fast))+(fast.length>1?' are':' is')+' rising fast.</b>');
     if (sev.length) s.push('Severe rain above '+esc(list(sev))+'.');
     if (vh) s.push('Very heavy rain above '+vh+' more creek'+(vh>1?'s':'')+'.');
     s.push('The Bay tide is '+TIDE.dir+' ('+TIDE.next+').');
@@ -252,14 +266,16 @@
   }
   function card(c){
     var k=rainLevel(c), r=R[k];
-    var cls='card'+(c.dash==='watch'?' watch':c.dash==='warning'?' warning':(!c.dash && k==='severe')?' severe':'');
+    var cls='card'+(c.dash==='watch'?' watch':c.dash==='warning'?' warning':(!c.dash && (k==='severe'||isFast(c)))?' severe':'');
     var h='<div class="head"><h3>'+esc(c.name)+'</h3><div class="place">'+esc(c.place)+'</div></div><div class="rows">';
     if (c.dash) {
       var o=O[c.dash];
-      h+='<div class="r"><span class="lbl">Creek level</span><span class="val">'+(c.dash==='normal' ? 'Normal' : '<span class="tag '+c.dash+'">'+o.name+'</span>')+'</span></div>';
+      h+='<div class="r"><span class="lbl">Creek level</span><span class="val">'+(c.dash==='normal' ? 'Normal' : '<span class="tag '+c.dash+'">'+o.name+'</span>')+'<span style="font-weight:500">· '+trendTxt(c)+'</span></span></div>';
+    } else {
+      h+='<div class="r"><span class="lbl">Creek level</span><span class="val">'+trendTxt(c)+'</span></div>';
     }
     if (k==='stale') h+='<div class="r"><span class="lbl">Rain upstream</span><span class="val">No recent data</span></div>';
-    else if (k!=='none') h+='<div class="r"><span class="lbl">Rain upstream</span><span class="val">'+meter(r.bars)+r.name+'</span></div>';
+    else if (k!=='none') h+='<div class="r"><span class="lbl">Rain upstream</span><span class="val">'+rchip(k)+'</span></div>';
     else if (!c.dash) h+='<div class="r"><span class="lbl">Rain upstream</span><span class="val" style="font-weight:500">No alerts</span></div>';
     h+=tideRow(c)+'</div>';
 
@@ -271,19 +287,21 @@
     else if (k==='stale') { say='The rain gauge for this creek hasn’t reported since '+c.stale+'. Conditions may have changed.'; todo=r.todo; }
     else if (k!=='none') { say='Rain over the '+durWords(c)+' in the hills above is '+(k==='severe'?'rare for this area':k==='vheavy'?'the kind this area sees only every few years':'heavier than a typical storm here')+'.'+(c.extra?' '+c.extra:''); todo=r.todo; }
     else { todo=r.todo; }
+    if (!c.dash && isFast(c)) { say='The creek is rising quickly.'+(say?' '+say:''); if (k!=='severe') todo=R.severe.todo; }
     if (c.tidal && TIDE.dir==='rising' && (isHeavy(c) || (c.dash && c.dash!=='normal'))) say+=(say?' ':'')+'The rising tide slows drainage near the Bay.';
 
     h+='<div class="body">'+(c.dash==='warning'?'<p class="danger">If you are in danger, call 911.</p>':'')+(say?'<p>'+esc(say)+'</p>':'')+'<p class="todo"><b>What to do:</b> '+esc(todo)+'</p></div>';
-    if (c.dash==='warning' || c.dash==='watch' || (!c.dash && k==='severe')) h+='<a class="act" href="'+GENASYS+'">Check your evacuation zone <span aria-hidden="true">→</span></a>';
-    h+='<div class="foot"><span>'+(k==='stale' ? 'Last report '+esc(c.stale) : 'As of '+NOW)+(c.dash ? '' : ' · Creek level not measured here')+(c.limited?' · Rain gauges may miss storms here':'')+'</span>'+
-       (c.dash ? '<a href="#" aria-label="See the creek level chart for '+esc(c.name)+'">Creek level chart <span aria-hidden="true">→</span></a>' : '')+'</div>';
+    if (c.dash==='warning' || c.dash==='watch' || (!c.dash && (k==='severe'||isFast(c)))) h+='<a class="act" href="'+GENASYS+'">Check your evacuation zone <span aria-hidden="true">→</span></a>';
+    h+='<div class="foot"><span>'+(k==='stale' ? 'Last report '+esc(c.stale) : 'As of '+NOW)+(c.dash ? '' : ' · No flood level set for this creek yet')+(c.limited?' · Rain gauges may miss storms here':'')+'</span>'+
+       '<a href="#" aria-label="See the creek level chart for '+esc(c.name)+'">Creek level chart <span aria-hidden="true">→</span></a></div>';
     return '<article class="'+cls+'">'+h+'</article>';
   }
   function row(c){
     var k=rainLevel(c), r=R[k], heavy=c.driver ? c.driver.split(' at ') : null;
     return '<tr><td class="cn"><b>'+esc(c.name)+'</b><span>'+esc(c.place)+'</span></td>'+
-      '<td>'+(c.dash ? (c.dash==='normal'?'Normal':'<span class="tag '+c.dash+'">'+O[c.dash].name+'</span>') : '<span class="dim">No gauge</span>')+'</td>'+
-      '<td>'+(k==='none'?'<span class="dim">Normal</span>':k==='stale'?'<span class="gap">No recent data</span>':'<span style="display:inline-flex;gap:8px;align-items:center;font-weight:700">'+meter(r.bars)+r.name+'</span>')+'</td>'+
+      '<td>'+(c.dash ? (c.dash==='normal'?'Normal':'<span class="tag '+c.dash+'">'+O[c.dash].name+'</span>') : '<span class="dim">No threshold</span>')+
+        '<span class="sm">'+trendTxt(c)+' · '+esc(c.rate)+' ft/hr</span></td>'+
+      '<td>'+(k==='none'?'<span class="dim">Normal</span>':k==='stale'?'<span class="gap">No recent data</span>':rchip(k))+'</td>'+
       '<td><b style="font-size:16px">'+(k==='none'||k==='stale'?'—':esc(c.aep))+'</b></td>'+
       '<td>'+(heavy ? esc(heavy[0])+'<span class="sm">at '+esc(heavy[1])+'</span>' : '<span class="dim">Nothing above normal</span>')+'</td>'+
       '<td><b style="font-size:16px">'+c.up+'</b> <span class="dim">of '+c.of+'</span></td>'+
