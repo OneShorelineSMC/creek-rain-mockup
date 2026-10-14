@@ -5,33 +5,53 @@ on:
     inputs:
       start:
         description: "Start date (YYYY-MM-DD)"
-        default: "2020-10-01"
+        default: "2007-10-01"
       end:
         description: "End date (YYYY-MM-DD) — leave blank for now"
         default: ""
-      sites:
-        description: "USGS site numbers, space-separated — leave blank for all"
-        default: ""
 
 jobs:
+  # One job per site, all running at the same time, each with its own time limit.
   pull:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 180
+    strategy:
+      fail-fast: false        # one slow or failed site doesn't cancel the others
+      max-parallel: 5         # stay polite to USGS
+      matrix:
+        site: ["11164500", "11162500", "11162570", "11162619", "11162620",
+               "11162630", "111626182", "11162753", "11162750"]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Pull USGS data
+      - name: Pull USGS data for ${{ matrix.site }}
         env:
           USGS_API_KEY: ${{ secrets.USGS_API_KEY }}
         run: |
-          ARGS="--start ${{ inputs.start }}"
-          if [ -n "${{ inputs.end }}" ];   then ARGS="$ARGS --end ${{ inputs.end }}"; fi
-          if [ -n "${{ inputs.sites }}" ]; then ARGS="$ARGS --sites ${{ inputs.sites }}"; fi
+          ARGS="--start ${{ inputs.start }} --sites ${{ matrix.site }}"
+          if [ -n "${{ inputs.end }}" ]; then ARGS="$ARGS --end ${{ inputs.end }}"; fi
           python usgs_pull.py $ARGS
-      - name: Save the CSVs for download
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: usgs-${{ matrix.site }}
+          path: data/usgs/
+          if-no-files-found: ignore
+
+  # Combine every site into one download.
+  combine:
+    needs: pull
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: usgs-*
+          path: data/usgs
+          merge-multiple: true
+      - uses: actions/upload-artifact@v4
         with:
           name: usgs-data
           path: data/usgs/
