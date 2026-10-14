@@ -241,7 +241,8 @@ def main():
                             "+".join(sorted(sources))])
             print(f"ok   {site:10s} {PARAMS[code]:20s} {len(rows):8d} rows  {rows[0][0]} → {rows[-1][0]}")
 
-    with open(os.path.join(OUT, "_summary.csv"), "w", newline="") as f:
+    tag = "" if sorted(a.sites) == sorted(SITES) else "_" + "_".join(a.sites)
+    with open(os.path.join(OUT, "_summary" + tag + ".csv"), "w", newline="") as f:
         w = csv.writer(f)
         w.writerow(["site", "name", "parameter", "parameter_name", "rows", "first_utc", "last_utc", "source"])
         w.writerows(summary)
