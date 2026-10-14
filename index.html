@@ -36,6 +36,11 @@
   .pill{margin:0 18px;border-radius:8px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;gap:12px}
   .pill strong{font-size:19px;display:flex;align-items:center;gap:8px}.pill span{font-size:15px;font-weight:600}
   .heads-up{margin:10px 18px 0;padding:10px 12px;border-radius:8px;background:#EEF3FC;border:1px solid #C9D8F2;font-size:15px;line-height:1.45;display:flex;gap:10px;align-items:flex-start}
+  .tide{margin:10px 18px 0;padding:10px 12px;border-radius:8px;background:#E6F4F3;border:1px solid #B9DEDB;font-size:15px;line-height:1.45;display:flex;gap:10px;align-items:flex-start}
+  .tide.compound{background:#0F5C57;border-color:#0F5C57;color:#FFFFFF}
+  .tide svg{flex-shrink:0;margin-top:3px}
+  .tidenote{display:flex;gap:8px;align-items:center;font-size:14px;color:var(--soft);margin-top:12px}
+  .flag2{display:inline-block;margin-top:4px;font-size:12px;font-weight:700;color:#FFFFFF;background:#0F5C57;border-radius:4px;padding:2px 6px}
   .body{padding:12px 18px 16px;display:flex;flex-direction:column;gap:10px}
   .body p{margin:0;font-size:16px;line-height:1.5}
   .todo{color:var(--soft)}.todo b{color:var(--ink)}
@@ -47,7 +52,7 @@
   .sumhead{font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-top:24px}
   .note{font-size:14px;color:var(--muted);line-height:1.5;margin:16px 0 0}
   .tbl-wrap{overflow-x:auto;margin:16px 0 28px;background:var(--card);border:1px solid var(--line);border-radius:12px}
-  .tbl{width:100%;border-collapse:collapse;min-width:820px;font-size:15px}
+  .tbl{width:100%;border-collapse:collapse;min-width:960px;font-size:15px}
   .tbl th{text-align:left;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600;padding:12px 14px;border-bottom:1px solid var(--line);background:var(--panel)}
   .tbl td{padding:12px 14px;border-bottom:1px solid #ECEFF3;vertical-align:top}
   .tbl tr:last-child td{border-bottom:0}
@@ -66,7 +71,7 @@
   <div class="wrap">
     <h1 id="title">Creek conditions</h1>
     <p id="sub">Where we measure creek levels, you'll see the official status. Where we don't yet, you'll see how heavy the rain is in the hills above the creek, so you can stay ahead of rising water.</p>
-    <div class="meta"><span>Updated [TIME]</span><span class="sample">MOCKUP — sample storm, not real conditions</span></div>
+    <div class="meta"><span>Updated 10:15 AM</span><span class="sample">MOCKUP — sample storm, not real conditions</span></div>
     <div class="tabs" role="tablist" aria-label="View">
       <button role="tab" id="t-pub" aria-selected="true" aria-controls="v-pub">Public view</button>
       <button role="tab" id="t-staff" aria-selected="false" aria-controls="v-staff">Staff view</button>
@@ -88,6 +93,7 @@
         <div id="lg-rain"></div>
       </div>
     </div>
+    <div class="tidenote" id="tidenote"></div>
     <div class="grid" id="pub-cards"></div>
   </section>
 
@@ -96,10 +102,10 @@
     <div class="summary" id="sum-official"></div>
     <div class="sumhead">Rain in the hills above — all creeks</div>
     <div class="summary" id="sum-rain"></div>
-    <p class="note">Official creek level comes from the creek dashboards and always takes priority. Rain is shown for every creek: on dashboard creeks it is an early heads-up, elsewhere it is the only indicator. <b>Chance in any year</b> is the annual exceedance probability (AEP) of the heaviest rain at any of the creek's gauges. Severe rain needs at least two gauges agreeing.</p>
+    <p class="note">Official creek level comes from the creek dashboards and always takes priority. Rain is shown for every creek: on dashboard creeks it is an early heads-up, elsewhere it is the only indicator. <b>Chance in any year</b> is the annual exceedance probability (AEP) of the heaviest rain at any of the creek's gauges. Severe rain needs at least two gauges agreeing. <b>Rain + tide</b> flags tidal creeks where rain is very heavy or severe within 2 hours of high tide.</p>
     <div class="tbl-wrap">
       <table class="tbl">
-        <thead><tr><th scope="col">Creek</th><th scope="col">Official creek level</th><th scope="col">Rain upstream</th><th scope="col">Chance in any year</th><th scope="col">Heaviest rain</th><th scope="col">Gauges elevated</th><th scope="col">Notes</th></tr></thead>
+        <thead><tr><th scope="col">Creek</th><th scope="col">Official creek level</th><th scope="col">Rain upstream</th><th scope="col">Chance in any year</th><th scope="col">Heaviest rain</th><th scope="col">Gauges elevated</th><th scope="col">Tide</th><th scope="col">Notes</th></tr></thead>
         <tbody id="staff-rows"></tbody>
       </table>
     </div>
@@ -130,6 +136,10 @@
   function rainLevel(c){ return {none:'none',yellow:'heavy',orange:'vheavy',red:'severe',purple:'severe',magenta:'severe'}[c]; }
   var DROP = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.5s-6.5 7.2-6.5 11.8a6.5 6.5 0 0 0 13 0C18.5 9.7 12 2.5 12 2.5z"/></svg>';
   var WAVE = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 9c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 5 2"/><path d="M2 16c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 5 2"/></svg>';
+
+  // Sample tide — one Bayside high tide for all tidal creeks until each creek's tide gauge is set.
+  var TIDE = {time:'11:40 AM', height:'6.8 ft', until:'in about 1½ hours', surge:'+0.8 ft', withinWindow:true};
+  var TIDAL = {'Colma Creek':1,'San Bruno Creek':1,'Green Hills Creek':1,'San Mateo Creek':1,'San Francisquito Creek':1,'Redwood Creek':1};
 
   // Sample storm — illustrative. Rain colors computed against each gauge's Atlas 14 table;
   // official creek levels are made up to show each combination.
@@ -182,6 +192,15 @@
     var r=R[k]; lr.appendChild(el('div',{'class':'lgrow'},'<span class="sw" style="background:'+r.bg+';color:'+r.fg+'">'+DROP+'</span><b>'+esc(r.name)+'</b><span>'+esc(r.chance)+'</span>'));
   });
 
+  function isCompound(c){ var k=rainLevel(c.rain); return TIDAL[c.name] && TIDE.withinWindow && (k==='vheavy'||k==='severe'); }
+  function tideLine(c){
+    if (!TIDAL[c.name]) return '';
+    if (c.dash) return '<div class="tide">'+WAVE+'<span><b>Next high tide '+esc(TIDE.time)+'</b> ('+esc(TIDE.height)+'), '+esc(TIDE.until)+'. Water near the Bay drains slowly around high tide.</span></div>';
+    if (isCompound(c)) return '<div class="tide compound">'+WAVE+'<span><b>Heavy rain and high tide together</b> ('+esc(TIDE.time)+'). Low areas near the Bay may flood.</span></div>';
+    return '<div class="tide">'+WAVE+'<span><b>High tide '+esc(TIDE.time)+'</b> ('+esc(TIDE.height)+'). Creeks near the Bay drain slowly around high tide.</span></div>';
+  }
+  document.getElementById('tidenote').innerHTML = '<span style="color:#0F5C57">'+WAVE+'</span><span>Teal notes appear on creeks affected by Bay tides.</span>';
+
   // Public cards: one status per creek
   var pc=document.getElementById('pub-cards');
   creeks.forEach(function(c){
@@ -192,13 +211,13 @@
         ? '<div class="heads-up"><span style="color:#3E6FC8;flex-shrink:0;padding-top:2px">'+DROP+'</span><span><b>'+esc(r.name)+' upstream.</b> The creek may rise. Check back often.</span></div>' : '';
       h = '<div class="head"><h3>'+esc(c.name)+'</h3><div class="place">'+esc(c.place)+'</div></div>'+
           '<div class="kind">'+WAVE+'Official creek level</div>'+
-          '<div class="pill" style="background:'+o.bg+';color:'+o.fg+'"><strong>'+esc(o.name)+'</strong></div>'+ headsUp +
+          '<div class="pill" style="background:'+o.bg+';color:'+o.fg+'"><strong>'+esc(o.name)+'</strong></div>'+ headsUp + tideLine(c) +
           '<div class="body"><p class="todo"><b>What to do:</b> '+esc(o.todo)+'</p></div>'+
           '<div class="foot"><span>Measured in the creek</span><a href="#" aria-label="Open the '+esc(c.name)+' dashboard">View creek dashboard →</a></div>';
     } else {
       h = '<div class="head"><h3>'+esc(c.name)+'</h3><div class="place">'+esc(c.place)+'</div></div>'+
           '<div class="kind">'+DROP+'Rain in the hills above</div>'+
-          '<div class="pill" style="background:'+r.bg+';color:'+r.fg+'"><strong>'+esc(r.name)+'</strong>'+(c.rain!=='none' ? '<span>~'+esc(c.aep)+' chance / yr</span>' : '')+'</div>'+
+          '<div class="pill" style="background:'+r.bg+';color:'+r.fg+'"><strong>'+esc(r.name)+'</strong>'+(c.rain!=='none' ? '<span>~'+esc(c.aep)+' chance / yr</span>' : '')+'</div>'+ tideLine(c) +
           '<div class="body"><p>'+esc(c.rainText || 'Rain so far is normal for a storm here.')+'</p><p class="todo"><b>What to do:</b> '+esc(r.todo)+'</p></div>'+
           '<div class="foot"><span>Creek level is not monitored for alerts here — rain only.'+(c.limited?' Limited rain data for this creek.':'')+'</span></div>';
     }
@@ -228,6 +247,7 @@
       '<td><b style="font-size:17px">'+(c.rain==='none'?'—':esc(c.aep))+'</b></td>'+
       '<td>'+(heavy ? esc(heavy[0])+'<span class="sm">at '+esc(heavy[1])+'</span>' : '<span class="dim">Nothing above normal</span>')+'</td>'+
       '<td><b style="font-size:17px">'+c.up+'</b> <span class="dim">of '+c.of+'</span></td>'+
+      '<td>'+(TIDAL[c.name] ? 'High '+esc(TIDE.time)+' · '+esc(TIDE.height)+'<span class="sm">surge '+esc(TIDE.surge)+'</span>'+(isCompound(c)?'<span class="flag2">Rain + tide</span>':'') : '<span class="dim">Not tidal</span>')+'</td>'+
       '<td>'+(c.note ? '<span class="gap">'+esc(c.note)+'</span>' : '')+'</td>';
     rows.appendChild(el('tr',null,h));
   });
